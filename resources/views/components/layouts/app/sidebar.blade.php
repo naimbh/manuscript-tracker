@@ -61,6 +61,7 @@
                         <div class="min-w-0 leading-tight"><div class="truncate text-sm font-semibold">{{ auth()->user()->name }}</div><div class="truncate text-xs text-zinc-500">{{ auth()->user()->email }}</div></div>
                     </div>
                     <flux:menu.separator />
+                    @if (auth()->user()->is_admin)<flux:menu.item :href="route('settings.general')" icon="adjustments-horizontal" wire:navigate>General settings</flux:menu.item>@endif
                     <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>Settings</flux:menu.item>
                     <flux:menu.item :href="route('settings.research')" icon="academic-cap" wire:navigate>Research profile</flux:menu.item>
                     <flux:menu.item :href="route('settings.ai')" icon="sparkles" wire:navigate>AI settings</flux:menu.item>

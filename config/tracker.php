@@ -18,6 +18,12 @@ return [
     // Account the local MCP server (php artisan mcp:start tracker) acts for. Defaults to the first account.
     'mcp_user' => env('TRACKER_MCP_USER'),
 
+    // Site identity, editable in Settings → General.
+    'tagline' => env('TRACKER_TAGLINE', 'from draft to decision'),
+    'description' => env('TRACKER_DESCRIPTION', 'A self-hosted tracker for academic papers: submissions, review clocks, venues, calls for papers and citations.'),
+    'contact_email' => env('TRACKER_CONTACT_EMAIL'),
+    'registration' => (bool) env('TRACKER_REGISTRATION', true),
+
     // Footer credit.
     'credit' => [
         'name' => env('TRACKER_CREDIT_NAME', 'Naim Bin Hasan'),

@@ -170,6 +170,8 @@ To seed your own papers without committing them, put a seeder in `database/seede
 
 ## Configuration
 
+The first account is the site admin. Under **Settings → General** the admin sets the site name, tagline, description, timezone, contact email, footer credit, and whether new people can sign up (turn this off for a private site).
+
 Everything specific to a person or a deployment is set in `.env` or in Settings, not in the code: the first account (`TRACKER_ADMIN_*`), schedules (`TRACKER_*_DAY`, `TRACKER_*_TIME`), the AI provider and keys, the MCP account (`TRACKER_MCP_USER`), and the footer credit (`TRACKER_CREDIT_NAME`, `TRACKER_CREDIT_URL`; leave empty to hide). Each user sets their own Scholar profile and interests.
 
 ## Tests

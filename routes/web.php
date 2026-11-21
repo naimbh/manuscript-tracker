@@ -29,6 +29,7 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/data', 'settings.data')->name('settings.data');
     Volt::route('settings/ai', 'settings.ai')->name('settings.ai');
     Volt::route('settings/research', 'settings.research')->name('settings.research');
+    Volt::route('settings/general', 'settings.general')->name('settings.general');
     Volt::route('settings/agents', 'settings.agents')->name('settings.agents');
 });
 

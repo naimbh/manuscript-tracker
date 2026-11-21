@@ -14,8 +14,8 @@
                 <a href="{{ route('home') }}" class="relative flex items-center gap-3" wire:navigate>
                     <span class="rounded-2xl bg-white/20 p-1 ring-1 ring-white/40 shadow-lg shadow-indigo-900/30"><x-app-logo-icon class="size-10" /></span>
                     <span class="leading-tight">
-                        <span class="block text-lg font-semibold tracking-tight">Manuscript Tracker</span>
-                        <span class="block text-xs text-white/70">from draft to decision</span>
+                        <span class="block text-lg font-semibold tracking-tight">{{ config('app.name') }}</span>
+                        <span class="block text-xs text-white/70">{{ config('tracker.tagline') }}</span>
                     </span>
                 </a>
 
@@ -57,8 +57,8 @@
                     <a href="{{ route('home') }}" class="mb-8 flex flex-col items-center gap-3 lg:hidden" wire:navigate>
                         <x-app-logo-icon class="size-14 drop-shadow-md" />
                         <span class="text-center leading-tight">
-                            <span class="block text-xl font-semibold tracking-tight">Manuscript<span class="bg-gradient-to-r from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent">Tracker</span></span>
-                            <span class="mt-0.5 block text-xs text-zinc-500">from draft to decision</span>
+                            <span class="block text-xl font-semibold tracking-tight">{{ config('app.name') }}</span>
+                            <span class="mt-0.5 block text-xs text-zinc-500">{{ config('tracker.tagline') }}</span>
                         </span>
                     </a>
                     <div class="rounded-3xl border border-zinc-200/80 bg-white p-7 shadow-2xl shadow-indigo-900/10 sm:p-10 dark:border-zinc-800 dark:bg-zinc-900">
@@ -67,7 +67,7 @@
                         </div>
                     </div>
                     <p class="mt-6 text-center text-[11px] text-zinc-400">
-                        © {{ now()->year }} @if (config('tracker.credit.name')){{ config('tracker.credit.name') }} · @endif Manuscript Tracker
+                        © {{ now()->year }} @if (config('tracker.credit.name')){{ config('tracker.credit.name') }} · @endif {{ config('app.name') }}
                     </p>
                 </div>
             </main>

@@ -34,13 +34,22 @@ class Setting extends Model
         'compatible.base_url' => 'services.compatible.base_url',
         'compatible.key' => 'services.compatible.key',
         'compatible.model' => 'services.compatible.model',
+        'site.name' => 'app.name',
+        'site.tagline' => 'tracker.tagline',
+        'site.description' => 'tracker.description',
+        'site.contact_email' => 'tracker.contact_email',
+        'site.registration' => 'tracker.registration',
+        'site.timezone' => 'app.timezone',
+        'site.credit_name' => 'tracker.credit.name',
+        'site.credit_url' => 'tracker.credit.url',
     ];
 
     public const SECRET = ['ai.claude_token', 'anthropic.key', 'openai.key', 'gemini.key', 'compatible.key'];
 
     public static function put(string $key, ?string $value): void
     {
-        if ($value === null || $value === '') {
+        // null removes the setting (falls back to .env); an empty string is stored, e.g. to hide the tagline.
+        if ($value === null) {
             static::whereKey($key)->delete();
 
             return;
@@ -67,9 +76,10 @@ class Setting extends Model
             }
             foreach (static::all() as $s) {
                 if (isset(self::CONFIG[$s->key]) && ($v = $s->plain()) !== null) {
-                    config([self::CONFIG[$s->key] => $v]);
+                    config([self::CONFIG[$s->key] => $s->key === 'site.registration' ? $v === '1' : $v]);
                 }
             }
+            date_default_timezone_set(config('app.timezone'));
         } catch (\Throwable) {
         }
     }

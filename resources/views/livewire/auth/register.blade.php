@@ -10,6 +10,11 @@ use Livewire\Attributes\Title;
 use Livewire\Volt\Component;
 
 new #[Layout('components.layouts.auth'), Title('Create account')] class extends Component {
+    public function boot(): void
+    {
+        abort_unless(config('tracker.registration'), 404);
+    }
+
     public string $name = '';
     public string $email = '';
     public string $password = '';
@@ -20,6 +25,7 @@ new #[Layout('components.layouts.auth'), Title('Create account')] class extends 
      */
     public function register(): void
     {
+        abort_unless(config('tracker.registration'), 404);
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],

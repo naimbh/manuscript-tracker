@@ -34,7 +34,7 @@ class CalendarController extends Controller
         $esc = fn (string $t) => addcslashes($t, ",;\\");
         $fmt = fn (CarbonInterface $d) => $d->format('Ymd');
         $lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Manuscript Tracker//EN', 'CALSCALE:GREGORIAN',
-            'X-WR-CALNAME:Manuscript Tracker'];
+            'X-WR-CALNAME:'.config('app.name')];
         $stamp = now()->utc()->format('Ymd\THis\Z');
         foreach ($events as $e) {
             $lines = array_merge($lines, ['BEGIN:VEVENT', "UID:{$e['uid']}@manuscripttracker", "DTSTAMP:{$stamp}",

@@ -46,6 +46,7 @@ class User extends Authenticatable // implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'scholar_stats' => 'array',
+            'is_admin' => 'boolean',
             'scholar_checked_at' => 'datetime',
         ];
     }
@@ -63,7 +64,12 @@ class User extends Authenticatable // implements MustVerifyEmail
 
     protected static function booted(): void
     {
-        static::created(fn (User $user) => \App\Support\VenueCatalog::seedFor($user));
+        static::created(function (User $user) {
+            if (static::count() === 1) {
+                $user->forceFill(['is_admin' => true])->saveQuietly();
+            }
+            \App\Support\VenueCatalog::seedFor($user);
+        });
     }
 
     public function papers(): HasMany
