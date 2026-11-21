@@ -1,0 +1,6 @@
+# For hosts where the domain cannot point at /public (common on cPanel):
+# send every request into public/, so .env, storage and the source stay unreachable.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

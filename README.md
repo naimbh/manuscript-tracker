@@ -140,6 +140,14 @@ Settings → Agents shows the exact config to copy. The local server acts for th
 
 **Over the web**: create an agent token under **Settings → Agents** and connect your client to `https://your-domain/mcp` with the header `Authorization: Bearer <token>`.
 
+## Deploying to shared hosting (cPanel)
+
+1. Clone the repo with cPanel → Git Version Control, outside `public_html`.
+2. Run `composer install --no-dev --optimize-autoloader`, copy `.env.example` to `.env`, set `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL` and the database, then `php artisan key:generate --force` and `php artisan migrate --force`.
+3. Build the front end locally (`npm run build`) and upload `public/build`, since most shared hosts have no Node.js.
+4. Point the domain's document root at `public/`. If you cannot, the root `.htaccess` sends every request into `public/`.
+5. Add a cron job: `* * * * * cd /path/to/manuscript-tracker && php artisan schedule:run >> /dev/null 2>&1`.
+
 ## Schedules
 
 | Job | When |
