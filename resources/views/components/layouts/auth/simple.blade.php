@@ -53,7 +53,7 @@
 
             {{-- Form --}}
             <main class="flex flex-1 flex-col items-center justify-center px-5 py-10 sm:px-10">
-                <div class="w-full max-w-sm">
+                <div class="w-full max-w-md">
                     <a href="{{ route('home') }}" class="mb-8 flex flex-col items-center gap-3 lg:hidden" wire:navigate>
                         <x-app-logo-icon class="size-14 drop-shadow-md" />
                         <span class="text-center leading-tight">
@@ -61,8 +61,8 @@
                             <span class="mt-0.5 block text-xs text-zinc-500">from draft to decision</span>
                         </span>
                     </a>
-                    <div class="rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-xl shadow-indigo-900/5 sm:p-8 dark:border-zinc-800 dark:bg-zinc-900">
-                        <div class="flex flex-col gap-6">
+                    <div class="rounded-3xl border border-zinc-200/80 bg-white p-7 shadow-2xl shadow-indigo-900/10 sm:p-10 dark:border-zinc-800 dark:bg-zinc-900">
+                        <div class="flex flex-col gap-7">
                             {{ $slot }}
                         </div>
                     </div>
