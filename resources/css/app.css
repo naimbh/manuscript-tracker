@@ -48,7 +48,7 @@
 }
 
 [data-flux-field] {
-    @apply grid gap-2;
+    @apply grid content-start gap-2;
 }
 
 [data-flux-label] {
