@@ -1,6 +1,6 @@
 <div class="mx-auto flex w-full max-w-6xl items-start max-md:flex-col">
-    <div class="mr-10 w-full pb-4 md:w-[220px]">
-        <flux:navlist>
+    <div class="w-full pb-4 md:mr-10 md:w-[220px]" x-data x-init="$nextTick(() => $el.querySelector('[data-current]')?.scrollIntoView({ inline: 'center', block: 'nearest' }))">
+        <flux:navlist class="max-md:-mx-4 max-md:flex max-md:w-[calc(100%+2rem)] max-md:flex-row max-md:gap-1 max-md:overflow-x-auto max-md:px-4 max-md:[&_[data-flux-navlist-item]]:shrink-0 max-md:[&_[data-flux-navlist-item]]:w-auto">
             <flux:navlist.item href="{{ route('settings.profile') }}" wire:navigate>Profile</flux:navlist.item>
             <flux:navlist.item href="{{ route('settings.password') }}" wire:navigate>Password</flux:navlist.item>
             <flux:navlist.item href="{{ route('settings.appearance') }}" wire:navigate>Appearance</flux:navlist.item>

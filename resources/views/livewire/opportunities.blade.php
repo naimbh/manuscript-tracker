@@ -84,18 +84,18 @@ new #[Title('Opportunities')] class extends Component {
 }; ?>
 
 <div class="page-in mx-auto w-full max-w-6xl space-y-6" @if ($running) wire:poll.6s @endif>
-    <section class="hero relative overflow-hidden rounded-2xl border border-zinc-200/80 px-6 py-6 sm:px-8 dark:border-zinc-800">
+    <section class="hero relative overflow-hidden rounded-2xl border border-zinc-200/80 px-4 py-5 sm:px-8 sm:py-6 dark:border-zinc-800">
         <div class="hero-grid pointer-events-none absolute inset-0 text-zinc-900 dark:text-white"></div>
-        <div class="relative flex flex-wrap items-end justify-between gap-4">
+        <div class="relative flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
             <div class="max-w-xl">
                 <p class="eyebrow">Opportunities</p>
-                <h1 class="mt-1 text-2xl font-semibold tracking-tight">Calls that fit your work</h1>
+                <h1 class="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">Calls that fit your work</h1>
                 <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Every day, the AI reads new calls from WikiCFP and the publishers’ call pages, keeps only those with proceedings or a journal behind them, and ranks them against your interests.</p>
                 <button class="mt-3 inline-flex max-w-full items-center gap-1.5 truncate rounded-full bg-white/70 px-3 py-1 text-xs text-zinc-600 ring-1 ring-zinc-200 hover:ring-indigo-300 dark:bg-zinc-900/60 dark:text-zinc-300 dark:ring-zinc-700" x-on:click="$flux.modal('interests').show()">
                     <flux:icon.adjustments-horizontal variant="micro" class="size-3.5 shrink-0" /> <span class="truncate">{{ $interests }}</span>
                 </button>
             </div>
-            <div class="flex flex-col items-end gap-2">
+            <div class="flex flex-col items-start gap-2 sm:items-end">
                 <flux:button variant="primary" icon="{{ $running ? 'arrow-path' : 'magnifying-glass-circle' }}" wire:click="scanNow" :disabled="$running || ! $aiReady" class="{{ $running ? '[&_svg]:animate-spin' : '' }}">
                     {{ $running ? 'Scanning…' : 'Scan now' }}
                 </flux:button>
@@ -118,7 +118,7 @@ new #[Title('Opportunities')] class extends Component {
         </flux:callout>
     @endif
 
-    <div class="flex items-center gap-1 rounded-lg bg-zinc-100 p-0.5 text-sm font-medium w-fit dark:bg-zinc-800">
+    <div class="flex w-full items-center gap-1 overflow-x-auto rounded-lg bg-zinc-100 p-0.5 text-sm font-medium sm:w-fit dark:bg-zinc-800 [&>button]:shrink-0">
         @foreach (['open' => 'Open calls', 'saved' => 'Saved', 'dismissed' => 'Dismissed', 'history' => 'History'] as $k => $l)
             <button wire:click="$set('show', '{{ $k }}')" class="rounded-md px-3 py-1.5 transition {{ $show === $k ? 'bg-white text-zinc-900 shadow-xs dark:bg-zinc-700 dark:text-white' : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200' }}">{{ $l }}</button>
         @endforeach
@@ -178,8 +178,8 @@ new #[Title('Opportunities')] class extends Component {
             <div class="stagger grid gap-3">
                 @foreach ($items as $o)
                     @php $days = $o->deadline_on ? (int) now()->startOfDay()->diffInDays($o->deadline_on, false) : null; @endphp
-                    <article wire:key="o{{ $o->id }}" class="panel lift flex gap-4 p-4">
-                        <div class="flex w-14 shrink-0 flex-col items-center gap-1.5 pt-0.5">
+                    <article wire:key="o{{ $o->id }}" class="panel lift flex gap-3 p-3.5 sm:gap-4 sm:p-4">
+                        <div class="flex w-11 shrink-0 flex-col items-center gap-1.5 pt-0.5 sm:w-14">
                             <div class="flex gap-0.5" aria-label="Fit {{ $o->fit }} of 5">
                                 @for ($i = 1; $i <= 5; $i++)<span class="h-4 w-1.5 rounded-full {{ $i <= $o->fit ? 'bg-gradient-to-t from-indigo-500 to-fuchsia-500' : 'bg-zinc-200 dark:bg-zinc-700' }}"></span>@endfor
                             </div>

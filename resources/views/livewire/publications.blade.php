@@ -142,12 +142,12 @@ new #[Title('Published')] class extends Component {
         }
      }">
 
-    <section class="hero relative overflow-hidden rounded-2xl border border-zinc-200/80 px-6 py-6 sm:px-8 dark:border-zinc-800">
+    <section class="hero relative overflow-hidden rounded-2xl border border-zinc-200/80 px-4 py-5 sm:px-8 sm:py-6 dark:border-zinc-800">
         <div class="hero-grid pointer-events-none absolute inset-0 text-zinc-900 dark:text-white"></div>
-        <div class="relative flex flex-wrap items-end justify-between gap-4">
+        <div class="relative flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
             <div>
                 <p class="eyebrow">Published</p>
-                <h1 class="mt-1 text-2xl font-semibold tracking-tight">Your published work</h1>
+                <h1 class="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">Your published work</h1>
                 <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
                     Citation counts from Google Scholar.
                     @if ($lastCheck) Last checked {{ $lastCheck->diffForHumans() }}. @endif
@@ -155,7 +155,7 @@ new #[Title('Published')] class extends Component {
                     @if ($scholar) <a href="{{ $scholar }}" target="_blank" class="font-medium text-indigo-600 hover:underline">Open Scholar profile ↗</a>@endif
                 </p>
             </div>
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-2">
                 @if (! $scholar)<flux:button icon="academic-cap" x-on:click="$flux.modal('scholar').show()">Connect Google Scholar</flux:button>@endif
                 <flux:button icon="plus" wire:click="edit">Add</flux:button>
                 <flux:button variant="primary" icon="sparkles" :disabled="! $aiReady" x-show="! run" wire:click="refreshProfile" wire:loading.attr="disabled" wire:target="refreshProfile" :tooltip="$aiStatus"><span wire:loading.remove wire:target="refreshProfile">Update from Scholar</span><span wire:loading wire:target="refreshProfile">Reading Scholar…</span></flux:button>
@@ -178,7 +178,7 @@ new #[Title('Published')] class extends Component {
         $top = (int) ceil($ymax / $step) * $step;
         $qcol = ['Q1' => 'bg-emerald-500', 'Q2' => 'bg-lime-500', 'Q3' => 'bg-amber-400', 'Q4' => 'bg-orange-400', 'NA' => 'bg-zinc-300 dark:bg-zinc-600'];
     @endphp
-    <div class="grid gap-6 lg:grid-cols-[1fr_18rem]">
+    <div class="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
         {{-- Article list, Scholar style --}}
         <div class="space-y-4">
             @if ($pubs->isNotEmpty())
@@ -198,14 +198,14 @@ new #[Title('Published')] class extends Component {
             @endif
 
             <div class="panel overflow-hidden">
-                <div class="grid grid-cols-[1fr_4.5rem_3.5rem] items-center border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-[11px] font-semibold tracking-wide text-zinc-500 uppercase dark:border-zinc-800 dark:bg-zinc-900">
+                <div class="grid grid-cols-[1fr_3.5rem_3rem] items-center border-b sm:grid-cols-[1fr_4.5rem_3.5rem] border-zinc-200 bg-zinc-50 px-4 py-2.5 text-[11px] font-semibold tracking-wide text-zinc-500 uppercase dark:border-zinc-800 dark:bg-zinc-900">
                     <button wire:click="$set('sort', 'year')" class="text-left {{ $sort === 'year' ? 'text-indigo-600' : '' }}">Title</button>
                     <button wire:click="$set('sort', 'cites')" class="text-right {{ $sort === 'cites' ? 'text-indigo-600' : '' }}">Cited by</button>
                     <button wire:click="$set('sort', 'year')" class="text-right {{ $sort === 'year' ? 'text-indigo-600' : '' }}">Year</button>
                 </div>
                 <div class="stagger divide-y divide-zinc-100 dark:divide-zinc-800">
                     @forelse ($pubs as $p)
-                        <div wire:key="pub{{ $p->id }}" class="group grid grid-cols-[1fr_4.5rem_3.5rem] gap-x-2 px-4 py-3.5 transition-colors hover:bg-zinc-50/80 dark:hover:bg-zinc-800/30" :class="busy[{{ $p->id }}] && 'bg-indigo-50/60 dark:bg-indigo-500/5'">
+                        <div wire:key="pub{{ $p->id }}" class="group grid grid-cols-[1fr_3.5rem_3rem] gap-x-2 px-3.5 py-3 sm:grid-cols-[1fr_4.5rem_3.5rem] sm:px-4 sm:py-3.5 transition-colors hover:bg-zinc-50/80 dark:hover:bg-zinc-800/30" :class="busy[{{ $p->id }}] && 'bg-indigo-50/60 dark:bg-indigo-500/5'">
                             <div class="min-w-0">
                                 <a href="{{ $p->scholar_url ?: ($p->url ?: '#') }}" target="_blank" class="leading-snug font-medium text-indigo-700 hover:underline dark:text-indigo-300">{{ $p->title }}</a>
                                 <span class="ml-1 inline-block rounded-full px-1.5 py-px align-middle text-[10px] font-bold {{ $p->quartile ? ($qcol[$p->quartile].' text-white') : 'bg-zinc-200 text-zinc-500 dark:bg-zinc-700 dark:text-zinc-300' }}">{{ $p->quartile ?: 'NA' }}</span>
@@ -240,7 +240,7 @@ new #[Title('Published')] class extends Component {
         </div>
 
         {{-- Cited by box --}}
-        <aside class="space-y-4">
+        <aside class="order-first space-y-4 lg:order-none">
             <div class="panel p-4">
                 <div class="flex items-center justify-between">
                     <h2 class="font-semibold">Cited by</h2>

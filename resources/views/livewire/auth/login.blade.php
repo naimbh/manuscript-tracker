@@ -7,10 +7,11 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.auth')] class extends Component {
+new #[Layout('components.layouts.auth'), Title('Log in')] class extends Component {
     #[Validate('required|string|email')]
     public string $email = '';
 
@@ -73,7 +74,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
 }; ?>
 
 <div class="flex flex-col gap-6">
-    <x-auth-header title="Log in to your account" description="Enter your email and password below to log in" />
+    <x-auth-header title="Welcome back" description="Log in to see where your papers stand." />
 
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />

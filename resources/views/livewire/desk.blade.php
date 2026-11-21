@@ -76,11 +76,11 @@ new #[Title('Desk')] class extends Component {
 
 <div class="page-in mx-auto w-full max-w-6xl space-y-6">
     {{-- Hero --}}
-    <section class="hero relative overflow-hidden rounded-2xl border border-zinc-200/80 px-6 py-7 sm:px-8 dark:border-zinc-800">
+    <section class="hero relative overflow-hidden rounded-2xl border border-zinc-200/80 px-4 py-5 sm:px-8 sm:py-7 dark:border-zinc-800">
         <div class="hero-grid pointer-events-none absolute inset-0 text-zinc-900 dark:text-white"></div>
         <div class="relative">
             <p class="eyebrow">{{ now()->format('l, j F Y') }}</p>
-            <h1 class="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
+            <h1 class="mt-1 text-xl font-semibold tracking-tight sm:text-3xl">
                 Good {{ now()->hour < 12 ? 'morning' : (now()->hour < 18 ? 'afternoon' : 'evening') }}, {{ str(auth()->user()->name)->before(' ') }}.
             </h1>
             <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
@@ -88,16 +88,16 @@ new #[Title('Desk')] class extends Component {
                 @else {{ $attention->count() }} {{ str('thing')->plural($attention->count()) }} could use your attention.
                 @endif
             </p>
-            <div class="stagger mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div class="stagger mt-5 grid grid-cols-2 gap-2 sm:mt-6 sm:gap-3 lg:grid-cols-4">
                 @foreach ($stats as [$label, $value, $icon, $grad])
-                    <div class="lift rounded-xl border border-white/60 bg-white/70 p-4 backdrop-blur dark:border-white/5 dark:bg-zinc-900/60">
+                    <div class="lift rounded-xl border border-white/60 bg-white/70 p-3 backdrop-blur sm:p-4 dark:border-white/5 dark:bg-zinc-900/60">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-medium text-zinc-500">{{ $label }}</span>
                             <span class="flex size-7 items-center justify-center rounded-lg bg-gradient-to-br {{ $grad }} text-white shadow-sm">
                                 <flux:icon :name="$icon" variant="micro" />
                             </span>
                         </div>
-                        <x-ui.count :value="$value" class="mt-2 block text-3xl font-semibold tracking-tight" />
+                        <x-ui.count :value="$value" class="mt-1 block text-2xl font-semibold tracking-tight sm:mt-2 sm:text-3xl" />
                     </div>
                 @endforeach
             </div>
@@ -111,9 +111,9 @@ new #[Title('Desk')] class extends Component {
             </x-ui.empty>
         </div>
     @else
-        <div class="grid gap-6 lg:grid-cols-5">
+        <div class="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-5">
             {{-- Attention --}}
-            <section class="panel p-5 lg:col-span-3">
+            <section class="panel p-4 sm:p-5 lg:col-span-3">
                 <div class="mb-3 flex items-center justify-between">
                     <h2 class="font-semibold">Needs attention</h2>
                     <span class="num text-xs text-zinc-400">{{ $attention->count() }}</span>
@@ -127,7 +127,7 @@ new #[Title('Desk')] class extends Component {
                             </span>
                             <div class="min-w-0 flex-1">
                                 <a href="{{ route('papers.index', $a['paper']) }}" wire:navigate class="text-sm font-medium hover:text-indigo-600">{{ $a['paper']->displayTitle() }}</a>
-                                <p class="text-sm text-zinc-500">{{ $a['text'] }}</p>
+                                <p class="text-sm break-words text-zinc-500">{{ $a['text'] }}</p>
                             </div>
                             @if (! empty($a['next']))
                                 <flux:button size="sm" variant="primary" wire:click="submitNext({{ $a['paper']->id }})" icon-trailing="arrow-right">Submit</flux:button>
@@ -142,7 +142,7 @@ new #[Title('Desk')] class extends Component {
             </section>
 
             {{-- Deadlines --}}
-            <section class="panel p-5 lg:col-span-2">
+            <section class="panel p-4 sm:p-5 lg:col-span-2">
                 <div class="mb-3 flex items-center justify-between">
                     <h2 class="font-semibold">Coming up</h2>
                     <a href="{{ route('deadlines') }}" wire:navigate class="text-xs text-zinc-500 hover:text-indigo-600">All deadlines</a>
@@ -173,7 +173,7 @@ new #[Title('Desk')] class extends Component {
         {{-- Review clocks --}}
         @if ($clocks->isNotEmpty())
             <section>
-                <div class="mb-3 flex items-baseline justify-between">
+                <div class="mb-3 flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
                     <h2 class="font-semibold">Review clocks</h2>
                     <span class="text-xs text-zinc-400">Days in review against each venue’s usual decision time</span>
                 </div>
@@ -203,8 +203,8 @@ new #[Title('Desk')] class extends Component {
 
         {{-- Journey map --}}
         @if ($lanes->isNotEmpty())
-            <section class="panel overflow-hidden p-5">
-                <div class="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+            <section class="panel overflow-hidden p-4 sm:p-5">
+                <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between">
                     <h2 class="font-semibold">The last twelve months</h2>
                     <div class="flex flex-wrap gap-3 text-xs text-zinc-500">
                         <span class="flex items-center gap-1.5"><i class="size-2 rounded-full bg-sky-500"></i>In review</span>
@@ -214,13 +214,13 @@ new #[Title('Desk')] class extends Component {
                     </div>
                 </div>
                 <div class="relative">
-                    <div class="ml-36 grid grid-cols-12 border-b border-zinc-100 pb-1 text-[10px] uppercase tracking-wide text-zinc-400 dark:border-zinc-800">
+                    <div class="ml-24 grid grid-cols-12 border-b sm:ml-36 max-sm:[&>span:nth-child(even)]:invisible border-zinc-100 pb-1 text-[10px] uppercase tracking-wide text-zinc-400 dark:border-zinc-800">
                         @foreach ($months as $m)<span>{{ $m->format('M') }}</span>@endforeach
                     </div>
                     <div class="space-y-2 pt-3">
                         @foreach ($lanes as $i => $lane)
                             <div class="flex items-center">
-                                <a href="{{ route('papers.index', $lane['paper']) }}" wire:navigate class="w-36 shrink-0 truncate pr-3 text-xs font-medium hover:text-indigo-600">{{ $lane['paper']->displayTitle() }}</a>
+                                <a href="{{ route('papers.index', $lane['paper']) }}" wire:navigate class="w-24 shrink-0 truncate pr-2 text-[11px] font-medium hover:text-indigo-600 sm:w-36 sm:pr-3 sm:text-xs">{{ $lane['paper']->displayTitle() }}</a>
                                 <div class="relative h-6 flex-1 rounded-md bg-zinc-50 dark:bg-zinc-800/40">
                                     @foreach ($lane['bars'] as $b)
                                         @php $col = ['blue' => 'bg-gradient-to-r from-sky-400 to-sky-500', 'amber' => 'bg-gradient-to-r from-amber-400 to-amber-500', 'red' => 'bg-gradient-to-r from-rose-400 to-rose-500', 'green' => 'bg-gradient-to-r from-emerald-400 to-emerald-500', 'zinc' => 'bg-zinc-300 dark:bg-zinc-600'][$b['s']->tone()]; @endphp
@@ -234,9 +234,9 @@ new #[Title('Desk')] class extends Component {
                             </div>
                         @endforeach
                     </div>
-                    <div class="pointer-events-none absolute top-0 bottom-0 ml-36" style="left: 0; right: 0">
+                    <div class="pointer-events-none absolute top-0 bottom-0 ml-24 sm:ml-36" style="left: 0; right: 0">
                         <div class="absolute top-0 bottom-0 w-px bg-indigo-500/70" style="left: {{ $todayX }}%">
-                            <span class="absolute -top-0.5 -translate-x-1/2 rounded bg-indigo-600 px-1 text-[9px] font-semibold text-white">today</span>
+                            <span class="absolute -top-0.5 -translate-x-full rounded bg-indigo-600 px-1 text-[9px] font-semibold text-white">today</span>
                         </div>
                     </div>
                 </div>

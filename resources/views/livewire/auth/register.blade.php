@@ -6,9 +6,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.auth')] class extends Component {
+new #[Layout('components.layouts.auth'), Title('Create account')] class extends Component {
     public string $name = '';
     public string $email = '';
     public string $password = '';
@@ -36,7 +37,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
 }; ?>
 
 <div class="flex flex-col gap-6">
-    <x-auth-header title="Create an account" description="Enter your details below to create your account" />
+    <x-auth-header title="Create your tracker" description="Free for researchers. Your papers stay in this app’s database." />
 
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />

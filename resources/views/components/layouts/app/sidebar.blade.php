@@ -12,7 +12,7 @@
             if ($event.key === 'n') { $event.preventDefault(); $flux.modal('new-paper').show(); }
             if ($event.key === '/') { const s = document.querySelector('[data-search]'); if (s) { $event.preventDefault(); s.focus(); } }
           ">
-        <flux:sidebar sticky stashable class="border-r border-zinc-200/70 bg-white/60 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
+        <flux:sidebar sticky stashable class="border-r border-zinc-200/70 bg-white shadow-xl lg:bg-white/60 lg:shadow-none lg:backdrop-blur dark:border-zinc-800 dark:bg-zinc-900 lg:dark:bg-zinc-900/60">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
             <a href="{{ route('dashboard') }}" class="mr-5 flex items-center space-x-2" wire:navigate>

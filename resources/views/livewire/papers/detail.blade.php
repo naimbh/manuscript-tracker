@@ -356,9 +356,9 @@ new class extends Component {
 
 <div class="page-in flex min-h-0 flex-1 flex-col">
     {{-- Header --}}
-    <header class="border-b border-zinc-200/80 px-6 pt-5 lg:px-8 dark:border-zinc-800">
+    <header class="border-b border-zinc-200/80 px-4 pt-4 sm:px-6 sm:pt-5 lg:px-8 dark:border-zinc-800">
         <a href="{{ route('papers.index') }}" wire:navigate class="mb-3 inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-indigo-600 lg:hidden"><flux:icon.chevron-left variant="micro" /> Papers</a>
-        <div class="flex items-start justify-between gap-4">
+        <div class="flex flex-col-reverse items-start gap-3 sm:flex-row sm:justify-between sm:gap-4">
             <div class="min-w-0">
                 <div class="flex flex-wrap items-center gap-2">
                     <flux:dropdown>
@@ -371,10 +371,10 @@ new class extends Component {
                     @if ($paper->short_title)<span class="text-xs text-zinc-400">{{ $paper->short_title }}</span>@endif
                     @foreach ($paper->tags ?? [] as $t)<a href="{{ route('papers.index', ['q' => '#'.$t]) }}" wire:navigate><x-ui.tag :tag="$t" /></a>@endforeach
                 </div>
-                <h1 class="mt-2 max-w-4xl text-xl leading-snug font-semibold tracking-tight text-balance sm:text-[1.6rem]">{{ $paper->title }}</h1>
+                <h1 class="mt-2 max-w-4xl text-lg leading-snug font-semibold tracking-tight text-balance sm:text-xl lg:text-[1.6rem]">{{ $paper->title }}</h1>
                 @if ($paper->method)<p class="mt-1 text-sm text-zinc-500">{{ $paper->method }}</p>@endif
             </div>
-            <div class="flex shrink-0 gap-1">
+            <div class="flex shrink-0 gap-1 self-end sm:self-auto">
                 <flux:button size="sm" icon="pencil-square" wire:click="editPaper">Edit</flux:button>
                 <flux:dropdown align="end">
                     <flux:button size="sm" variant="ghost" icon="ellipsis-horizontal" />
@@ -397,7 +397,7 @@ new class extends Component {
         </nav>
     </header>
 
-    <div class="flex-1 overflow-y-auto px-6 py-6 lg:px-8" wire:key="tab-{{ $tab }}">
+    <div class="flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8" wire:key="tab-{{ $tab }}">
         @if ($risk)
             <flux:callout variant="danger" icon="eye" class="mb-5" heading="Anonymity risk">
                 <flux:callout.text>This paper has a public preprint ({{ $paper->preprint_server ?: 'link' }}) while it is under double-anonymous review at {{ $risk->venue_name }}. Check the venue’s preprint policy, and do not cite the preprint in the anonymized file.</flux:callout.text>
@@ -406,8 +406,8 @@ new class extends Component {
 
         {{-- ================= PAPER: submissions + overview ================= --}}
         @if ($tab === 'submissions')
-            <div class="grid gap-6 xl:grid-cols-3">
-                <div class="space-y-6 xl:col-span-2">
+            <div class="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-3">
+                <div class="min-w-0 space-y-6 xl:col-span-2">
                     @php
                         $chron = $paper->submissions->sortBy(fn ($x) => [$x->submitted_on?->timestamp ?? 0, $x->id])->values();
                         $first = $chron->first()?->submitted_on;
@@ -416,7 +416,7 @@ new class extends Component {
                         $iconOf = ['blue' => 'clock', 'amber' => 'pencil', 'red' => 'x-mark', 'green' => 'check', 'zinc' => 'minus'];
                     @endphp
                     @if ($chron->isNotEmpty())
-                        <section class="panel relative overflow-hidden p-5">
+                        <section class="panel relative overflow-hidden p-4 sm:p-5">
                             <div class="pointer-events-none absolute -top-20 -right-10 size-56 rounded-full bg-gradient-to-br from-indigo-400/15 via-fuchsia-400/10 to-transparent blur-2xl"></div>
                             <div class="relative flex flex-wrap items-baseline justify-between gap-2">
                                 <h2 class="font-semibold">Journey</h2>
@@ -457,7 +457,7 @@ new class extends Component {
                             </div>
 
                             {{-- Stat tiles --}}
-                            <div class="relative mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            <div class="relative mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
                                 <div class="rounded-xl bg-gradient-to-br from-indigo-50 to-white p-3 ring-1 ring-indigo-100 dark:from-indigo-500/10 dark:to-transparent dark:ring-indigo-500/20">
                                     <p class="text-[11px] text-zinc-500">Venues tried</p><x-ui.count :value="$chron->count()" class="text-2xl font-semibold" />
                                 </div>
@@ -477,7 +477,7 @@ new class extends Component {
                     @endif
 
                     <div>
-                    <div class="mb-4 flex items-center justify-between">
+                    <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
                         <div><h2 class="font-semibold">Submission history</h2><p class="text-xs text-zinc-500">One paper, every venue it has been sent to, current journal first.</p></div>
                         <flux:button size="sm" variant="primary" icon="plus" wire:click="newSubmission">{{ $paper->submissions->isEmpty() ? 'Record submission' : 'Add another venue' }}</flux:button>
                     </div>
@@ -490,7 +490,7 @@ new class extends Component {
                     @endif
                     @forelse ($paper->submissions->sortByDesc(fn ($x) => $x->id === $cur?->id) as $sub)
                         @php $c = $sub->clock(); $items = $sub->revisionItems; $doneN = $items->where('done', true)->count(); $isCur = $cur && $cur->id === $sub->id; @endphp
-                        <div class="relative pb-6 pl-8" wire:key="s{{ $sub->id }}">
+                        <div class="relative pb-5 pl-7 sm:pb-6 sm:pl-8" wire:key="s{{ $sub->id }}">
                             @unless ($loop->last)<span class="absolute top-6 bottom-0 left-[11px] w-px bg-zinc-200 dark:bg-zinc-800"></span>@endunless
                             <span class="absolute top-1.5 left-0 flex size-6 items-center justify-center rounded-full ring-4 ring-[#f7f8fc] dark:ring-zinc-950
                                 {{ ['blue' => 'bg-sky-500', 'amber' => 'bg-amber-500', 'red' => 'bg-rose-500', 'green' => 'bg-emerald-500', 'zinc' => 'bg-zinc-400'][$sub->tone()] }} text-white">
@@ -635,7 +635,7 @@ new class extends Component {
                     @endif
                     </div>
                 </div>
-                <aside class="space-y-4">
+                <aside class="min-w-0 space-y-4">
                     <dl class="panel space-y-4 p-4 text-sm">
                         @foreach (['Method' => $paper->method, 'Data' => $paper->dataset] as $k => $v)
                             <div><dt class="text-xs text-zinc-400">{{ $k }}</dt><dd class="mt-0.5 leading-snug text-zinc-700 dark:text-zinc-200">{{ $v ?: '—' }}</dd></div>

@@ -211,12 +211,12 @@ new #[Title('Venues')] class extends Component {
      }">
 
     {{-- Header --}}
-    <section class="hero relative overflow-hidden rounded-2xl border border-zinc-200/80 px-6 py-6 sm:px-8 dark:border-zinc-800">
+    <section class="hero relative overflow-hidden rounded-2xl border border-zinc-200/80 px-4 py-5 sm:px-8 sm:py-6 dark:border-zinc-800">
         <div class="hero-grid pointer-events-none absolute inset-0 text-zinc-900 dark:text-white"></div>
-        <div class="relative flex flex-wrap items-end justify-between gap-4">
+        <div class="relative flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
             <div>
                 <p class="eyebrow">Venue library</p>
-                <h1 class="mt-1 text-2xl font-semibold tracking-tight">Where your papers can go</h1>
+                <h1 class="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">Where your papers can go</h1>
                 <p class="mt-1 max-w-xl text-sm text-zinc-600 dark:text-zinc-400">Conferences that publish proceedings, and journals with their quartile, speed and acceptance rate. Keep them current with one click.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
@@ -278,7 +278,7 @@ new #[Title('Venues')] class extends Component {
             @endforeach
         </div>
         <div class="w-full sm:w-64"><flux:input wire:model.live.debounce.150ms="q" data-search icon="magnifying-glass" size="sm" placeholder="Search venues" clearable /></div>
-        <div class="flex flex-wrap gap-1.5">
+        <div class="-mx-4 flex w-[calc(100%+2rem)] gap-1.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:w-auto sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&>button]:shrink-0">
             <button wire:click="$set('field', '')" class="rounded-full px-2.5 py-1 text-xs font-medium transition {{ $field === '' ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300' }}">All fields</button>
             @foreach ($fields as $f)
                 <button wire:click="$set('field', @js($f))" class="rounded-full px-2.5 py-1 text-xs font-medium transition {{ $field === $f ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300' }}">{{ $f }}</button>
@@ -297,9 +297,9 @@ new #[Title('Venues')] class extends Component {
         <div class="stagger grid gap-3 md:grid-cols-2" wire:key="conf-{{ $field }}-{{ $q }}">
             @foreach ($list as $v)
                 @php $d = $v->deadlineDays(); $past = $d !== null && $d < 0; @endphp
-                <article wire:key="v{{ $v->id }}" class="panel lift group relative flex gap-4 p-4" :class="busy[{{ $v->id }}] && 'ring-2 ring-indigo-400/60'">
+                <article wire:key="v{{ $v->id }}" class="panel lift group relative flex gap-3 p-3.5 sm:gap-4 sm:p-4" :class="busy[{{ $v->id }}] && 'ring-2 ring-indigo-400/60'">
                     {{-- Date block --}}
-                    <div class="flex w-16 shrink-0 flex-col items-center justify-center rounded-xl border py-2 text-center leading-none
+                    <div class="flex w-14 shrink-0 flex-col items-center justify-center rounded-xl border py-2 text-center leading-none sm:w-16
                         {{ $v->deadline_on && ! $past ? ($v->deadline_expected ? 'border-dashed border-amber-300 bg-amber-50/60 dark:border-amber-500/40 dark:bg-amber-500/5' : 'border-indigo-200 bg-indigo-50/70 dark:border-indigo-500/30 dark:bg-indigo-500/10') : 'border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800/50' }}">
                         @if ($v->deadline_on)
                             <span class="text-[10px] font-semibold uppercase tracking-wide {{ $past ? 'text-zinc-400' : 'text-rose-500' }}">{{ $v->deadline_on->format('M') }}</span>
@@ -317,7 +317,15 @@ new #[Title('Venues')] class extends Component {
                                 <h3 class="text-sm leading-snug font-semibold">{{ $v->name }}</h3>
                                 <p class="mt-0.5 text-xs text-zinc-500">{{ collect([$v->publisher, $v->field])->filter()->implode(' · ') }}</p>
                             </div>
-                            <div class="flex shrink-0 items-center opacity-60 transition group-hover:opacity-100">
+                            <flux:dropdown align="end" class="shrink-0 sm:hidden">
+                                <flux:button size="xs" variant="ghost" icon="ellipsis-horizontal" />
+                                <flux:menu>
+                                    <flux:menu.item :icon="$v->watch ? 'bell-slash' : 'bell'" wire:click="toggleWatch({{ $v->id }})">{{ $v->watch ? 'Stop watching' : 'Watch weekly' }}</flux:menu.item>
+                                    @if ($aiReady)<flux:menu.item icon="sparkles" x-on:click="single({{ $v->id }})">Update with AI</flux:menu.item>@endif
+                                    <flux:menu.item icon="pencil-square" wire:click="edit({{ $v->id }})">Edit</flux:menu.item>
+                                </flux:menu>
+                            </flux:dropdown>
+                            <div class="hidden shrink-0 items-center opacity-60 transition group-hover:opacity-100 sm:flex">
                                 <flux:button size="xs" variant="ghost" :icon="$v->watch ? 'bell-alert' : 'bell'" wire:click="toggleWatch({{ $v->id }})" :tooltip="$v->watch ? 'Watched: updated weekly' : 'Watch for weekly updates'" class="{{ $v->watch ? '!text-indigo-600 dark:!text-indigo-400' : '' }}" />
                                 <flux:button size="xs" variant="ghost" icon="sparkles" x-on:click="single({{ $v->id }})" ::disabled="busy[{{ $v->id }}] || run" :disabled="! $aiReady" tooltip="Update with AI" />
                                 <flux:button size="xs" variant="ghost" icon="pencil-square" wire:click="edit({{ $v->id }})" tooltip="Edit" />
@@ -356,8 +364,39 @@ new #[Title('Venues')] class extends Component {
             @endforeach
         </div>
     @else
+        {{-- Journal cards (phones) --}}
+        <div class="stagger space-y-2 sm:hidden">
+            @foreach ($list as $v)
+                @php $qc = ['Q1' => 'bg-emerald-500 text-white', 'Q2' => 'bg-lime-500 text-white', 'Q3' => 'bg-amber-400 text-white', 'Q4' => 'bg-zinc-400 text-white'][$v->quartile] ?? 'border border-dashed border-zinc-300 text-zinc-400 dark:border-zinc-600'; @endphp
+                <div wire:key="jm{{ $v->id }}" class="panel p-3.5" :class="busy[{{ $v->id }}] && 'ring-2 ring-indigo-400/60'">
+                    <div class="flex items-start gap-3">
+                        <span class="mt-0.5 inline-flex h-6 min-w-8 shrink-0 items-center justify-center rounded-md px-1.5 text-xs font-bold {{ $qc }}">{{ $v->quartile ?? '?' }}</span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm leading-snug font-medium">{{ $v->name }}</p>
+                            <p class="mt-0.5 text-xs text-zinc-500">{{ collect([$v->publisher, $v->field])->filter()->implode(' · ') }}</p>
+                        </div>
+                        <flux:dropdown align="end">
+                            <flux:button size="xs" variant="ghost" icon="ellipsis-horizontal" />
+                            <flux:menu>
+                                @if ($v->website_url)<flux:menu.item icon="arrow-up-right" :href="$v->website_url" target="_blank">Website</flux:menu.item>@endif
+                                @if ($aiReady)<flux:menu.item icon="sparkles" x-on:click="single({{ $v->id }})">Update with AI</flux:menu.item>@endif
+                                <flux:menu.item icon="pencil-square" wire:click="edit({{ $v->id }})">Edit</flux:menu.item>
+                            </flux:menu>
+                        </flux:dropdown>
+                    </div>
+                    <dl class="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
+                        <div><dt class="text-zinc-400">First decision</dt><dd class="text-zinc-700 dark:text-zinc-300">{{ $v->first_decision ?? '–' }}</dd></div>
+                        <div><dt class="text-zinc-400">Acceptance</dt><dd class="text-zinc-700 dark:text-zinc-300">{{ $v->acceptance_rate ?? '–' }}</dd></div>
+                        <div><dt class="text-zinc-400">Review</dt><dd class="text-zinc-700 dark:text-zinc-300">{{ \App\Models\Venue::REVIEW_TYPES[$v->review_type] ?? '–' }}</dd></div>
+                        <div><dt class="text-zinc-400">Fee</dt><dd class="truncate text-zinc-700 dark:text-zinc-300">{{ $v->fee ?? '–' }}</dd></div>
+                    </dl>
+                    <p x-show="busy[{{ $v->id }}]" x-cloak class="mt-2 flex items-center gap-1 text-[11px] text-indigo-600"><flux:icon.arrow-path variant="micro" class="size-3 animate-spin" />Searching…</p>
+                </div>
+            @endforeach
+        </div>
+
         {{-- Journal table --}}
-        <div class="panel overflow-hidden">
+        <div class="panel hidden overflow-hidden sm:block">
             <div class="overflow-x-auto">
                 <table class="w-full min-w-[860px] text-sm">
                     <thead>

@@ -62,7 +62,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="-m-6 flex min-h-[calc(100vh)] lg:-m-8">
+<div class="-m-4 flex min-h-[calc(100vh)] sm:-m-6 lg:-m-8">
     {{-- List --}}
     <aside class="{{ $paper ? 'hidden lg:flex' : 'flex' }} w-full shrink-0 flex-col lg:sticky lg:top-0 lg:h-screen lg:self-start border-r border-zinc-200/70 bg-white/40 lg:w-96 xl:w-[26rem] dark:border-zinc-800 dark:bg-zinc-900/30">
         <div class="sticky top-0 z-10 space-y-3 border-b border-zinc-200/80 bg-[#f7f8fc]/90 p-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
@@ -75,10 +75,10 @@ new class extends Component {
             <flux:input wire:model.live.debounce.150ms="q" data-search icon="magnifying-glass" placeholder="Search titles, venues, keywords" size="sm" clearable>
                 <x-slot name="iconTrailing"><span class="kbd">/</span></x-slot>
             </flux:input>
-            <div class="flex items-stretch gap-2"><div class="flex flex-1 gap-0.5 rounded-lg bg-zinc-100 p-0.5 text-xs font-medium dark:bg-zinc-800">
+            <div class="flex items-stretch gap-2"><div class="flex min-w-0 flex-1 gap-0.5 rounded-lg bg-zinc-100 p-0.5 text-[11px] font-medium sm:text-xs dark:bg-zinc-800">
                 @foreach (['active' => 'Active', 'review' => 'In review', 'done' => 'Accepted', 'all' => 'All'] as $k => $label)
                     <button wire:click="$set('filter', '{{ $k }}')"
-                            class="flex-1 rounded-md px-1.5 py-1.5 whitespace-nowrap transition {{ $filter === $k ? 'bg-white text-zinc-900 shadow-xs dark:bg-zinc-700 dark:text-white' : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200' }}">
+                            class="flex-1 rounded-md px-1 py-1.5 whitespace-nowrap transition sm:px-1.5 {{ $filter === $k ? 'bg-white text-zinc-900 shadow-xs dark:bg-zinc-700 dark:text-white' : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200' }}">
                         {{ $label }} <span class="num opacity-60">{{ $counts[$k] }}</span>
                     </button>
                 @endforeach
@@ -86,7 +86,7 @@ new class extends Component {
                 @if ($tags->isNotEmpty())
                     <flux:dropdown align="end">
                         <button class="flex h-full items-center gap-1 rounded-lg px-2.5 text-xs font-medium transition {{ str_starts_with($q, '#') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300' : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800' }}">
-                            <flux:icon.tag variant="micro" class="size-3.5" />{{ str_starts_with($q, '#') ? ltrim($q, '#') : 'Tags' }}
+                            <flux:icon.tag variant="micro" class="size-3.5" /><span class="max-[359px]:sr-only">{{ str_starts_with($q, '#') ? ltrim($q, '#') : 'Tags' }}</span>
                         </button>
                         <flux:menu>
                             @if (str_starts_with($q, '#'))<flux:menu.item icon="x-mark" wire:click="$set('q', '')">Clear tag</flux:menu.item><flux:menu.separator />@endif
