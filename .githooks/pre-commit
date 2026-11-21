@@ -1,0 +1,8 @@
+#!/bin/sh
+# Rebuild the front end and include public/build in every commit,
+# so servers without Node.js (e.g. cPanel) get current assets from git.
+# Enable once per clone with: git config core.hooksPath .githooks
+if command -v npm >/dev/null 2>&1 && [ -f package.json ]; then
+    npm run build --silent >/dev/null 2>&1 || { echo "pre-commit: npm run build failed" >&2; exit 1; }
+    git add -A public/build
+fi

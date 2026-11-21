@@ -144,7 +144,7 @@ Settings → Agents shows the exact config to copy. The local server acts for th
 
 1. Clone the repo with cPanel → Git Version Control, outside `public_html`.
 2. Run `composer install --no-dev --optimize-autoloader`, copy `.env.example` to `.env`, set `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL` and the database, then `php artisan key:generate --force` and `php artisan migrate --force`.
-3. Build the front end locally (`npm run build`) and upload `public/build`, since most shared hosts have no Node.js.
+3. The built front end (`public/build`) is committed, so the server does not need Node.js. If you change the CSS or JavaScript, run `git config core.hooksPath .githooks` once; the pre-commit hook then rebuilds and commits `public/build` for you.
 4. Point the domain's document root at `public/`. If you cannot, the root `.htaccess` sends every request into `public/`.
 5. Add a cron job: `* * * * * cd /path/to/manuscript-tracker && php artisan schedule:run >> /dev/null 2>&1`.
 
