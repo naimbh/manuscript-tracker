@@ -62,7 +62,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="-m-4 flex min-h-[calc(100dvh-3.5rem)] sm:-m-6 lg:-m-8 lg:min-h-dvh">
+<div class="-m-4 flex sm:-m-6 lg:-m-8 lg:min-h-dvh">
     {{-- List --}}
     <aside class="{{ $paper ? 'hidden lg:flex' : 'flex' }} w-full shrink-0 flex-col lg:sticky lg:top-0 lg:h-screen lg:self-start border-r border-zinc-200/70 bg-white/40 lg:w-96 xl:w-[26rem] dark:border-zinc-800 dark:bg-zinc-900/30">
         <div class="sticky top-0 z-10 space-y-3 border-b border-zinc-200/80 bg-[#f7f8fc]/90 p-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
