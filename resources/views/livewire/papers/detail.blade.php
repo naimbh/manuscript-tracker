@@ -673,7 +673,7 @@ new class extends Component {
                     <div class="panel p-4">
                         <h3 class="font-semibold">Next-venue queue</h3>
                         <p class="mt-0.5 text-xs text-zinc-500">If this round ends in rejection, the first venue becomes the next submission in one click.</p>
-                        @if ($paper->needsNextVenue() && $paper->queue->isNotEmpty())
+                        @if (($paper->needsNextVenue() || $paper->stage === 'ready') && $paper->queue->isNotEmpty())
                             <flux:button class="mt-3 w-full" variant="primary" icon-trailing="arrow-right" wire:click="submitNext">Submit to {{ str($paper->queue->first()->venue->name)->limit(28) }}</flux:button>
                         @endif
                         <div class="mt-3 space-y-1.5">

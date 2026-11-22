@@ -35,7 +35,12 @@ new #[Title('Desk')] class extends Component {
                 $attention->push(['tone' => 'amber', 'icon' => 'pencil-square', 'paper' => $p,
                     'text' => 'Revision due '.$cur->revision_due_on->diffForHumans().'.']);
             }
-            if ($p->needsNextVenue()) {
+            if ($p->stage === 'ready') {
+                $next = $p->queue->first();
+                $attention->prepend(['tone' => 'violet', 'icon' => 'paper-airplane', 'paper' => $p,
+                    'text' => $next ? "Ready to submit. Next venue: {$next->venue->name}." : 'Ready to submit. Add a venue to its next-venue queue.',
+                    'next' => (bool) $next]);
+            } elseif ($p->needsNextVenue()) {
                 $attention->push(['tone' => 'indigo', 'icon' => 'arrow-right', 'paper' => $p,
                     'text' => $p->queue->first() ? "Ready for its next venue: {$p->queue->first()->venue->name}." : 'Rejected last time, and the next-venue queue is empty.',
                     'next' => (bool) $p->queue->first()]);
@@ -119,9 +124,9 @@ new #[Title('Desk')] class extends Component {
                     <span class="num text-xs text-zinc-400">{{ $attention->count() }}</span>
                 </div>
                 @forelse ($attention as $a)
-                    @php $tones = ['red' => 'bg-rose-500/10 text-rose-600 dark:text-rose-400', 'amber' => 'bg-amber-500/10 text-amber-600 dark:text-amber-400', 'indigo' => 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400']; @endphp
+                    @php $tones = ['red' => 'bg-rose-500/10 text-rose-600 dark:text-rose-400', 'amber' => 'bg-amber-500/10 text-amber-600 dark:text-amber-400', 'indigo' => 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400', 'violet' => 'bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white shadow-sm shadow-violet-500/30']; @endphp
                     <div class="stagger">
-                        <div class="flex items-start gap-3 border-t border-zinc-100 py-3 first:border-0 dark:border-zinc-800">
+                        <div class="flex items-start gap-3 border-t border-zinc-100 py-3 first:border-0 dark:border-zinc-800 {{ $a['tone'] === 'violet' ? '-mx-2 rounded-xl border-transparent bg-violet-50/70 px-2 ring-1 ring-violet-200 dark:bg-violet-500/10 dark:ring-violet-500/30' : '' }}">
                             <span class="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg {{ $tones[$a['tone']] }}">
                                 <flux:icon :name="$a['icon']" variant="mini" />
                             </span>

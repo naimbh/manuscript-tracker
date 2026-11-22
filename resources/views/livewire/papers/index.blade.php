@@ -56,7 +56,8 @@ new class extends Component {
 
         return [
             'tags' => $all->flatMap(fn ($p) => $p->tags ?? [])->unique(fn ($t) => mb_strtolower($t))->sort()->values(),
-            'list' => $list->values(),
+            // Ready-to-submit papers first; the rest keep their most-recent order.
+            'list' => $list->sortBy(fn ($p) => $p->stage === 'ready' ? 0 : 1)->values(),
             'counts' => collect($groups)->map(fn ($f) => $all->filter($f)->count()),
         ];
     }
@@ -101,7 +102,8 @@ new class extends Component {
             @forelse ($list as $p)
                 @php
                     $cur = $p->currentSubmission; $clock = $cur?->clock(); $next = $p->queue->first();
-                    $tone = $cur ? $cur->tone() : (in_array($p->stage, ['ready']) ? 'violet' : 'zinc');
+                    $ready = $p->stage === 'ready';
+                    $tone = $ready ? 'violet' : ($cur ? $cur->tone() : 'zinc');
                     $tint = [
                         'blue' => 'before:bg-sky-500 bg-sky-50/60 hover:bg-sky-50 dark:bg-sky-500/[.06] dark:hover:bg-sky-500/10',
                         'amber' => 'before:bg-amber-500 bg-amber-50/60 hover:bg-amber-50 dark:bg-amber-500/[.06] dark:hover:bg-amber-500/10',
@@ -115,10 +117,12 @@ new class extends Component {
                 @endphp
                 <a href="{{ route('papers.index', $p) }}" wire:navigate.hover wire:key="p{{ $p->id }}"
                    class="group relative block overflow-hidden rounded-xl py-3 pr-3 pl-4 transition before:absolute before:inset-y-0 before:left-0 before:w-1 {{ $tint }}
-                          {{ $paper?->id === $p->id ? 'shadow-md ring-2 shadow-zinc-900/5 ring-indigo-500/70 dark:ring-indigo-400/60' : 'ring-1 ring-zinc-200/70 dark:ring-zinc-800' }}">
+                          {{ $paper?->id === $p->id ? 'shadow-md ring-2 shadow-zinc-900/5 ring-indigo-500/70 dark:ring-indigo-400/60' : ($ready ? 'shadow-lg shadow-violet-500/15 ring-2 ring-violet-400/70 dark:ring-violet-500/50' : 'ring-1 ring-zinc-200/70 dark:ring-zinc-800') }}">
                     <div class="flex items-center justify-between gap-2">
                         <span class="truncate text-[10px] font-bold tracking-[.08em] text-zinc-500 uppercase dark:text-zinc-400">{{ $p->short_title ?: 'Paper' }}</span>
-                        @if ($cur)<x-ui.decision :s="$cur" class="!py-0 !text-[11px]" />@else<x-ui.stage :stage="$p->stage" />@endif
+                        @if ($ready)
+                            <span class="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2 py-0.5 text-[11px] font-semibold text-white shadow-sm shadow-violet-500/30"><flux:icon.paper-airplane variant="micro" class="size-3" />Ready to submit</span>
+                        @elseif ($cur)<x-ui.decision :s="$cur" class="!py-0 !text-[11px]" />@else<x-ui.stage :stage="$p->stage" />@endif
                     </div>
                     <div class="mt-1 line-clamp-3 text-[13.5px] leading-snug font-semibold text-zinc-900 dark:text-zinc-50">{{ $p->title }}</div>
                     @if ($p->tags)<div class="mt-1.5 flex flex-wrap gap-1">@foreach ($p->tags as $t)<x-ui.tag :tag="$t" />@endforeach</div>@endif
