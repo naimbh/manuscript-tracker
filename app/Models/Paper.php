@@ -17,6 +17,7 @@ class Paper extends Model
         'idea' => 'Idea',
         'drafting' => 'Drafting',
         'ready' => 'Ready to submit',
+        'submitted' => 'Submitted',
         'under_review' => 'Under review',
         'revision' => 'Revising',
         'accepted' => 'Accepted',
@@ -97,10 +98,10 @@ class Paper extends Model
             'venue_name' => $next->venue->name,
             'portal_url' => $next->venue->portal_url,
             'submitted_on' => now()->toDateString(),
-            'decision' => 'pending',
+            'decision' => 'submitted',
         ]);
         $next->delete();
-        $this->update(['stage' => 'under_review']);
+        $this->update(['stage' => 'submitted']);
 
         return $sub;
     }

@@ -11,7 +11,7 @@ use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 use Laravel\Mcp\Server\Tools\Annotations\IsIdempotent;
 
-#[Description('Record an editor’s decision on a submission: pending, desk_reject, reject, major, minor, accept or withdrawn.')]
+#[Description('Record an editor’s decision on a submission or update its status: submitted, with_editor, pending (under review), awaiting_decision, returned (to the author for fixes), desk_reject, reject, major, minor, accept or withdrawn.')]
 class RecordDecision extends Tool
 {
     use ResolvesUser;
@@ -28,10 +28,10 @@ class RecordDecision extends Tool
             return Response::error('Unknown decision.');
         }
         $date = $request->get('date', now()->toDateString());
-        $s->update(['decision' => $decision, 'status_on' => $date, 'decision_on' => $decision === 'pending' ? null : $date,
+        $s->update(['decision' => $decision, 'status_on' => $date, 'decision_on' => in_array($decision, \App\Models\Submission::WAITING, true) ? null : $date,
             'revision_due_on' => $request->get('revision_due_on') ?? $s->revision_due_on]);
         if ($s->is_current || $s->paper->currentSubmission?->id === $s->id) {
-            $s->paper->update(['stage' => match ($decision) { 'pending' => 'under_review', 'major', 'minor' => 'revision', 'accept' => 'accepted', default => 'ready' }]);
+            $s->paper->update(['stage' => \App\Models\Submission::stageFor($decision)]);
         }
         if ($note = $request->get('note')) {
             $s->update(['note' => trim(($s->note ? $s->note."\n" : '').$note)]);

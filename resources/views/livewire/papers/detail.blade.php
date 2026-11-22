@@ -108,7 +108,7 @@ new class extends Component {
         $this->subId = null;
         $v = $venueId ? auth()->user()->venues()->find($venueId) : null;
         $this->s = ['venue_id' => $v?->id ?? '', 'venue_name' => $v?->name ?? '', 'manuscript_id' => '', 'portal_url' => $v?->portal_url ?? '',
-            'submitted_on' => today()->toDateString(), 'status_on' => '', 'decision' => 'pending', 'decision_on' => '', 'revision_due_on' => '', 'note' => ''];
+            'submitted_on' => today()->toDateString(), 'status_on' => '', 'decision' => 'submitted', 'decision_on' => '', 'revision_due_on' => '', 'note' => ''];
         $this->resetValidation();
         $this->openModal('sub-form');
     }
@@ -142,7 +142,7 @@ new class extends Component {
         $d = array_map(fn ($v) => $v === '' ? null : $v, $d);
         $venue = $d['venue_id'] ? auth()->user()->venues()->find($d['venue_id']) : auth()->user()->venues()->firstOrCreate(['name' => $d['venue_name']]);
         $d['venue_id'] = $venue?->id;
-        if ($d['decision'] !== 'pending' && ! $d['decision_on']) {
+        if (! in_array($d['decision'], Submission::WAITING, true) && ! $d['decision_on']) {
             $d['decision_on'] = today()->toDateString();
         }
 
@@ -170,7 +170,7 @@ new class extends Component {
     public function setDecision(int $id, string $decision): void
     {
         $sub = $this->paper->submissions()->findOrFail($id);
-        $sub->update(['decision' => $decision, 'status_on' => today(), 'decision_on' => $decision === 'pending' ? null : ($sub->decision_on ?? today())]);
+        $sub->update(['decision' => $decision, 'status_on' => today(), 'decision_on' => in_array($decision, Submission::WAITING, true) ? null : ($sub->decision_on ?? today())]);
         $this->syncStage($sub);
         $this->changed('Decision recorded: '.Submission::DECISIONS[$decision].'.');
     }
@@ -180,9 +180,7 @@ new class extends Component {
         if ($sub->id !== $this->paper->currentSubmission()->first()?->id) {
             return;
         }
-        $stage = match ($sub->decision) {
-            'pending' => 'under_review', 'major', 'minor' => 'revision', 'accept' => 'accepted', default => 'ready',
-        };
+        $stage = Submission::stageFor($sub->decision);
         if ($this->paper->stage !== 'published' || $stage !== 'accepted') {
             $this->paper->update(['stage' => $stage]);
         }
@@ -381,7 +379,7 @@ new class extends Component {
                             @foreach (Paper::STAGES as $k => $l)<flux:menu.item wire:click="setStage('{{ $k }}')">{{ $l }}</flux:menu.item>@endforeach
                         </flux:menu>
                     </flux:dropdown>
-                    @if ($cur && ! ($cur->decision === 'pending' && $paper->stage === 'under_review'))<x-ui.decision :s="$cur" />@endif
+                    @if ($cur && ! ($paper->stage === Submission::stageFor($cur->decision) && in_array($paper->stage, ['submitted', 'under_review'])))<x-ui.decision :s="$cur" />@endif
                     @if ($paper->short_title)<span class="text-xs text-zinc-400">{{ $paper->short_title }}</span>@endif
                     @foreach ($paper->tags ?? [] as $t)<a href="{{ route('papers.index', ['q' => '#'.$t]) }}" wire:navigate><x-ui.tag :tag="$t" /></a>@endforeach
                 </div>
@@ -463,7 +461,7 @@ new class extends Component {
                                         @php $j = $step['sub']; $isCurJ = $cur && $cur->id === $j->id; @endphp
                                             <div class="flex w-28 flex-col items-center text-center" style="animation: page-in .4s both {{ $i * 0.08 }}s">
                                                 <span class="relative flex size-9 items-center justify-center rounded-full text-white ring-4 {{ $ringTone[$j->tone()] }} {{ $isCurJ ? 'shadow-lg shadow-indigo-500/30' : '' }}">
-                                                    @if ($isCurJ && $j->decision === 'pending')<span class="absolute inset-0 animate-ping rounded-full bg-sky-400/40"></span>@endif
+                                                    @if ($isCurJ && $j->isWaiting())<span class="absolute inset-0 animate-ping rounded-full bg-sky-400/40"></span>@endif
                                                     <flux:icon :name="$iconOf[$j->tone()]" variant="mini" class="relative size-4" />
                                                 </span>
                                                 <span class="mt-2 line-clamp-2 text-xs leading-tight font-medium {{ $isCurJ ? 'text-zinc-900 dark:text-white' : 'text-zinc-600 dark:text-zinc-300' }}">{{ str($j->venue_name)->before(' (') }}</span>
@@ -502,8 +500,8 @@ new class extends Component {
                                     <p class="text-[11px] text-zinc-500">Days since first sent</p><x-ui.count :value="$first ? (int) $first->diffInDays(now()) : 0" class="text-2xl font-semibold" />
                                 </div>
                                 <div class="rounded-xl bg-gradient-to-br from-amber-50 to-white p-3 ring-1 ring-amber-100 dark:from-amber-500/10 dark:to-transparent dark:ring-amber-500/20">
-                                    <p class="text-[11px] text-zinc-500">{{ $cur && $cur->decision === 'pending' ? 'Days in current review' : 'Status' }}</p>
-                                    @if ($cur && $cur->decision === 'pending')<x-ui.count :value="$cur->daysInReview() ?? 0" class="text-2xl font-semibold" />
+                                    <p class="text-[11px] text-zinc-500">{{ $cur && $cur->isWaiting() ? ($cur->decision === 'pending' ? 'Days in current review' : 'Days since submission') : 'Status' }}</p>
+                                    @if ($cur && $cur->isWaiting())<x-ui.count :value="$cur->daysInReview() ?? 0" class="text-2xl font-semibold" />
                                     @else<p class="mt-1 text-sm font-semibold">{{ $cur ? Submission::DECISIONS[$cur->decision] : Paper::STAGES[$paper->stage] }}</p>@endif
                                 </div>
                             </div>
@@ -544,7 +542,7 @@ new class extends Component {
                                         <p class="mt-0.5 text-sm text-zinc-500">
                                             {{ $sub->manuscript_id ?: 'No manuscript ID' }} · Submitted {{ $sub->submitted_on?->format('j M Y') ?? 'date not set' }}
                                             @if ($sub->status_on) · {{ Submission::DECISIONS[$sub->decision] }} since {{ $sub->status_on->format('j M Y') }}@endif
-                                            @if ($sub->decision_on && $sub->decision !== 'pending') → {{ $sub->decision_on->format('j M Y') }}@endif
+                                            @if ($sub->decision_on && ! $sub->isWaiting()) → {{ $sub->decision_on->format('j M Y') }}@endif
                                             @if ($sub->daysInReview() !== null) · <span class="num">{{ $sub->daysInReview() }}</span> days @endif
                                         </p>
                                     </div>
@@ -558,7 +556,7 @@ new class extends Component {
                                         <flux:button size="sm" variant="ghost" icon="pencil-square" wire:click="editSubmission({{ $sub->id }})" />
                                     </div>
                                 </div>
-                                @if ($isCur && $sub->decision === 'pending' && $sub->daysInReview() !== null)
+                                @if ($isCur && $sub->isWaiting() && $sub->daysInReview() !== null)
                                     <div class="mt-4 flex items-center gap-4 rounded-xl bg-zinc-50 p-3 dark:bg-zinc-800/40">
                                         <x-ui.ring :pct="$c['pct'] ?? 0" :size="54" :tone="$c ? ($c['overdue'] ? 'red' : ($c['pct'] > 75 ? 'amber' : 'indigo')) : 'zinc'" :label="$sub->daysInReview()" sub="days" />
                                         <div class="min-w-0 flex-1 text-sm">
@@ -807,9 +805,9 @@ new class extends Component {
                 <flux:input wire:model="s.manuscript_id" label="Manuscript ID" placeholder="RNTW-2026-0123" />
                 <flux:input wire:model="s.portal_url" label="Portal link" placeholder="https://" />
                 <flux:input wire:model="s.submitted_on" type="date" label="Submitted on" />
-                <flux:input wire:model="s.status_on" type="date" label="Status since" description:trailing="e.g. the day it went under review" />
+                <flux:input wire:model="s.status_on" type="date" label="Status since" description:trailing="The day the current status began, e.g. the day it went under review" />
                 <flux:select wire:model.live="s.decision" label="Status">@foreach (Submission::DECISIONS as $k => $l)<flux:select.option value="{{ $k }}">{{ $l }}</flux:select.option>@endforeach</flux:select>
-                @if (($s['decision'] ?? 'pending') !== 'pending')<flux:input wire:model="s.decision_on" type="date" label="Decision on" />@endif
+                @if (! in_array($s['decision'] ?? 'submitted', Submission::WAITING, true))<flux:input wire:model="s.decision_on" type="date" label="Decision on" />@endif
                 @if (in_array($s['decision'] ?? '', ['major', 'minor']))<flux:input wire:model="s.revision_due_on" type="date" label="Revision due" />@endif
             </div>
             <flux:textarea wire:model="s.note" label="Note" rows="2" placeholder="Editor’s comments, reasons for the decision…" />

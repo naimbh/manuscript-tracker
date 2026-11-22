@@ -41,7 +41,7 @@ new class extends Component {
         $all = auth()->user()->papers()->with(['currentSubmission.venue', 'queue.venue', 'submissions'])->latest('updated_at')->get();
         $groups = [
             'active' => fn ($p) => ! in_array($p->stage, ['published', 'shelved']),
-            'review' => fn ($p) => in_array($p->stage, ['under_review', 'revision']),
+            'review' => fn ($p) => in_array($p->stage, ['submitted', 'under_review', 'revision']),
             'done' => fn ($p) => in_array($p->stage, ['accepted', 'published']),
             'all' => fn ($p) => true,
         ];
@@ -146,7 +146,7 @@ new class extends Component {
                             @if ($cur->manuscript_id)<span class="font-mono text-zinc-600 dark:text-zinc-300">{{ $cur->manuscript_id }}</span>@endif
                             @if ($cur->submitted_on)<span>Sent {{ $cur->submitted_on->format('j M') }}</span>@endif
                             @if ($cur->status_on)<span>· {{ \App\Models\Submission::DECISIONS[$cur->decision] }} {{ $cur->status_on->format('j M') }}</span>@endif
-                            @if ($cur->decision === 'pending' && $cur->daysInReview() !== null)<span class="num ml-auto font-semibold {{ $clock && $clock['overdue'] ? 'text-rose-500' : 'text-zinc-600 dark:text-zinc-300' }}">{{ $cur->daysInReview() }}d</span>@endif
+                            @if ($cur->isWaiting() && $cur->daysInReview() !== null)<span class="num ml-auto font-semibold {{ $clock && $clock['overdue'] ? 'text-rose-500' : 'text-zinc-600 dark:text-zinc-300' }}">{{ $cur->daysInReview() }}d</span>@endif
                         </div>
                     @endif
                     @if ($clock)

@@ -13,7 +13,11 @@ class Submission extends Model
     protected $casts = ['is_current' => 'boolean', 'submitted_on' => 'date', 'status_on' => 'date', 'decision_on' => 'date', 'revision_due_on' => 'date'];
 
     public const DECISIONS = [
+        'submitted' => 'Submitted',
+        'with_editor' => 'With editor',
         'pending' => 'Under review',
+        'awaiting_decision' => 'Awaiting decision',
+        'returned' => 'Returned to author',
         'desk_reject' => 'Desk rejected',
         'reject' => 'Rejected',
         'major' => 'Major revision',
@@ -21,6 +25,26 @@ class Submission extends Model
         'accept' => 'Accepted',
         'withdrawn' => 'Withdrawn',
     ];
+
+    /** Statuses where the paper is with the journal and no decision has been made yet. */
+    public const WAITING = ['submitted', 'with_editor', 'pending', 'awaiting_decision', 'returned'];
+
+    /** The paper stage that matches a submission status. */
+    public static function stageFor(string $decision): string
+    {
+        return match ($decision) {
+            'submitted', 'with_editor', 'returned' => 'submitted',
+            'pending', 'awaiting_decision' => 'under_review',
+            'major', 'minor' => 'revision',
+            'accept' => 'accepted',
+            default => 'ready',
+        };
+    }
+
+    public function isWaiting(): bool
+    {
+        return in_array($this->decision, self::WAITING, true);
+    }
 
     public function paper(): BelongsTo
     {
@@ -39,7 +63,7 @@ class Submission extends Model
 
     public function isActive(): bool
     {
-        return in_array($this->decision, ['pending', 'major', 'minor'], true);
+        return $this->isWaiting() || in_array($this->decision, ['major', 'minor'], true);
     }
 
     public function isRejection(): bool
@@ -52,7 +76,7 @@ class Submission extends Model
         if (! $this->submitted_on) {
             return null;
         }
-        $end = $this->decision === 'pending' ? now() : ($this->decision_on ?? now());
+        $end = $this->isWaiting() ? now() : ($this->decision_on ?? now());
         // While under review, count from the day review started if that is known.
         $start = $this->decision === 'pending' && $this->status_on ? $this->status_on : $this->submitted_on;
 
@@ -64,7 +88,7 @@ class Submission extends Model
     {
         $days = $this->daysInReview();
         $typical = $this->venue?->decision_days;
-        if ($this->decision !== 'pending' || $days === null || ! $typical) {
+        if (! $this->isWaiting() || $days === null || ! $typical) {
             return null;
         }
 
@@ -73,7 +97,7 @@ class Submission extends Model
             'typical' => $typical,
             'pct' => min(100, (int) round($days / $typical * 100)),
             'overdue' => $days > $typical,
-            'expected_on' => ($this->status_on ?? $this->submitted_on)->copy()->addDays($typical),
+            'expected_on' => ($this->decision === 'pending' && $this->status_on ? $this->status_on : $this->submitted_on)->copy()->addDays($typical),
         ];
     }
 
@@ -84,6 +108,7 @@ class Submission extends Model
             'minor', 'major' => 'amber',
             'desk_reject', 'reject' => 'red',
             'withdrawn' => 'zinc',
+            'returned' => 'amber',
             default => 'blue',
         };
     }

@@ -56,20 +56,20 @@ new #[Title('Desk')] class extends Component {
                 'paper' => $p,
                 'bars' => $p->submissions->filter(fn ($s) => $s->submitted_on)->map(function ($s) use ($start, $span) {
                     $from = max(0, $start->diffInDays($s->submitted_on, false));
-                    $to = max($from + 3, $start->diffInDays($s->decision === 'pending' ? now() : ($s->decision_on ?? now()), false));
+                    $to = max($from + 3, $start->diffInDays($s->isWaiting() ? now() : ($s->decision_on ?? now()), false));
                     return ['x' => $from / $span * 100, 'w' => max(1.2, ($to - $from) / $span * 100), 's' => $s];
                 })->filter(fn ($b) => $b['x'] + $b['w'] > 0)->values(),
             ])->values();
 
         return [
             'stats' => [
-                ['In review', $subs->where('decision', 'pending')->count(), 'clock', 'from-sky-500 to-indigo-500'],
+                ['With journals', $subs->filter->isWaiting()->count(), 'clock', 'from-sky-500 to-indigo-500'],
                 ['Revising', $papers->where('stage', 'revision')->count(), 'pencil-square', 'from-amber-400 to-orange-500'],
                 ['Accepted', $papers->whereIn('stage', ['accepted', 'published'])->count(), 'check-badge', 'from-emerald-400 to-teal-500'],
                 ['Sent this year', $subs->filter(fn ($s) => $s->submitted_on?->isCurrentYear())->count(), 'paper-airplane', 'from-fuchsia-500 to-violet-500'],
             ],
             'attention' => $attention,
-            'clocks' => $subs->where('decision', 'pending')->sortBy('submitted_on')->values(),
+            'clocks' => $subs->filter->isWaiting()->sortBy('submitted_on')->values(),
             'deadlines' => $user->deadlines()->with('paper')->where('done', false)->where('due_on', '>=', today()->subDays(7))->limit(6)->get(),
             'lanes' => $lanes,
             'months' => collect(range(0, 11))->map(fn ($i) => $start->copy()->addMonths($i)),

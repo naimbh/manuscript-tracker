@@ -32,10 +32,10 @@ class RecordSubmission extends Tool
         $s = $p->submissions()->create([
             'venue_id' => $venue->id, 'venue_name' => $venue->name, 'manuscript_id' => $request->get('manuscript_id'),
             'submitted_on' => $request->get('submitted_on', now()->toDateString()), 'portal_url' => $request->get('portal_url') ?? $venue->portal_url,
-            'decision' => 'pending', 'is_current' => true,
+            'decision' => 'submitted', 'is_current' => true,
         ]);
         $p->queue()->where('venue_id', $venue->id)->delete();
-        $p->update(['stage' => 'under_review']);
+        $p->update(['stage' => 'submitted']);
 
         return Response::text("Recorded submission #{$s->id} of “{$p->title}” to {$venue->name}.");
     }

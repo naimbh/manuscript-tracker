@@ -9,6 +9,6 @@
     ];
 @endphp
 <span {{ $attributes->class('inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset '.$map[$s->tone()]) }}>
-    @if ($s->decision === 'pending')<span class="pulse-dot size-1.5 rounded-full bg-current"></span>@endif
+    @if ($s->isWaiting())<span class="pulse-dot size-1.5 rounded-full bg-current"></span>@endif
     {{ \App\Models\Submission::DECISIONS[$s->decision] ?? $s->decision }}
 </span>
