@@ -113,7 +113,7 @@ new class extends Component {
                     $trail = $p->submissions->sortBy(fn ($x) => [$x->submitted_on?->timestamp ?? 0, $x->id])->values();
                     $dot = ['blue' => 'bg-sky-500', 'amber' => 'bg-amber-500', 'red' => 'bg-rose-500', 'green' => 'bg-emerald-500', 'zinc' => 'bg-zinc-400'];
                 @endphp
-                <a href="{{ route('papers.index', $p) }}" wire:navigate wire:key="p{{ $p->id }}"
+                <a href="{{ route('papers.index', $p) }}" wire:navigate.hover wire:key="p{{ $p->id }}"
                    class="group relative block overflow-hidden rounded-xl py-3 pr-3 pl-4 transition before:absolute before:inset-y-0 before:left-0 before:w-1 {{ $tint }}
                           {{ $paper?->id === $p->id ? 'shadow-md ring-2 shadow-zinc-900/5 ring-indigo-500/70 dark:ring-indigo-400/60' : 'ring-1 ring-zinc-200/70 dark:ring-zinc-800' }}">
                     <div class="flex items-center justify-between gap-2">

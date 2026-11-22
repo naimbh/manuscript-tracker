@@ -158,7 +158,7 @@ new #[Title('Published')] class extends Component {
             <div class="flex flex-wrap gap-2">
                 @if (! $scholar)<flux:button icon="academic-cap" x-on:click="$flux.modal('scholar').show()">Connect Google Scholar</flux:button>@endif
                 <flux:button icon="plus" wire:click="edit">Add</flux:button>
-                <flux:button variant="primary" icon="sparkles" :disabled="! $aiReady" x-show="! run" wire:click="refreshProfile" wire:loading.attr="disabled" wire:target="refreshProfile" :tooltip="$aiStatus"><span wire:loading.remove wire:target="refreshProfile">Update from Scholar</span><span wire:loading wire:target="refreshProfile">Reading Scholar…</span></flux:button>
+                <flux:button variant="primary" icon="sparkles" :disabled="! $aiReady" x-show="! run" wire:click="refreshProfile" wire:loading.attr="disabled" wire:target="refreshProfile" :title="$aiStatus"><span wire:loading.remove wire:target="refreshProfile">Update from Scholar</span><span wire:loading wire:target="refreshProfile">Reading Scholar…</span></flux:button>
                 <flux:button variant="danger" icon="stop" x-show="run" x-cloak x-on:click="run = false">Stop</flux:button>
             </div>
         </div>

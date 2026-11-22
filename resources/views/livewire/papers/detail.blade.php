@@ -32,6 +32,20 @@ new class extends Component {
     public ?int $checklistFor = null;
     public string $queueVenue = '';
 
+    /** Which pop-up form is built. Forms are only rendered when opened, which keeps the page light. */
+    public ?string $modal = null;
+
+    private function openModal(string $name): void
+    {
+        $this->modal = $name;
+        Flux::modal($name)->show();
+    }
+
+    public function openUpload(): void
+    {
+        $this->openModal('file-form');
+    }
+
     private const PAPER_FIELDS = ['title', 'short_title', 'stage', 'abstract', 'method', 'dataset', 'keywords', 'overleaf_url', 'drive_url', 'preprint_server', 'preprint_url', 'preprint_on', 'notes'];
 
     public function mount(Paper $paper): void
@@ -55,7 +69,7 @@ new class extends Component {
     {
         $this->p = collect(self::PAPER_FIELDS)->mapWithKeys(fn ($f) => [$f => $f === 'preprint_on' ? $this->paper->preprint_on?->toDateString() : $this->paper->$f])->all();
         $this->p['tags'] = implode(', ', $this->paper->tags ?? []);
-        Flux::modal('paper-form')->show();
+        $this->openModal('paper-form');
     }
 
     public function savePaper(): void
@@ -96,7 +110,7 @@ new class extends Component {
         $this->s = ['venue_id' => $v?->id ?? '', 'venue_name' => $v?->name ?? '', 'manuscript_id' => '', 'portal_url' => $v?->portal_url ?? '',
             'submitted_on' => today()->toDateString(), 'status_on' => '', 'decision' => 'pending', 'decision_on' => '', 'revision_due_on' => '', 'note' => ''];
         $this->resetValidation();
-        Flux::modal('sub-form')->show();
+        $this->openModal('sub-form');
     }
 
     public function editSubmission(int $id): void
@@ -107,7 +121,7 @@ new class extends Component {
             'submitted_on' => $sub->submitted_on?->toDateString(), 'status_on' => $sub->status_on?->toDateString(), 'decision' => $sub->decision, 'decision_on' => $sub->decision_on?->toDateString(),
             'revision_due_on' => $sub->revision_due_on?->toDateString(), 'note' => $sub->note];
         $this->resetValidation();
-        Flux::modal('sub-form')->show();
+        $this->openModal('sub-form');
     }
 
     public function updatedSVenueId($id): void
@@ -223,7 +237,7 @@ new class extends Component {
     {
         $this->checklistFor = $subId;
         $this->comments = '';
-        Flux::modal('comments')->show();
+        $this->openModal('comments');
     }
 
     public function importComments(): void
@@ -277,7 +291,7 @@ new class extends Component {
     public function preview(int $id): void
     {
         $this->previewId = $this->paper->files()->findOrFail($id)->id;
-        Flux::modal('preview')->show();
+        $this->openModal('preview');
     }
 
     public function deleteFile(int $id): void
@@ -294,7 +308,7 @@ new class extends Component {
         $this->a = ['name' => $au?->name ?? '', 'affiliation' => $au?->affiliation ?? '', 'email' => $au?->email ?? '', 'orcid' => $au?->orcid ?? '',
             'corresponding' => (bool) $au?->corresponding, 'roles' => $au?->roles ?? []];
         $this->resetValidation();
-        Flux::modal('author-form')->show();
+        $this->openModal('author-form');
     }
 
     public function saveAuthor(): void
@@ -509,11 +523,11 @@ new class extends Component {
                                     </div>
                                     <div class="flex items-center gap-1">
                                         @if ($sub->portal_url)<flux:button size="sm" variant="{{ $isCur ? 'primary' : 'filled' }}" icon-trailing="arrow-up-right" :href="$sub->portal_url" target="_blank">Open portal</flux:button>@endif
-                                        <flux:dropdown align="end">
-                                            <flux:button size="sm">Decision</flux:button>
-                                            <flux:menu>@foreach (Submission::DECISIONS as $k => $l)<flux:menu.item wire:click="setDecision({{ $sub->id }}, '{{ $k }}')">{{ $l }}</flux:menu.item>@endforeach
-                                                @if (! $isCur)<flux:menu.separator /><flux:menu.item icon="star" wire:click="makeCurrent({{ $sub->id }})">Make current journal</flux:menu.item>@endif</flux:menu>
-                                        </flux:dropdown>
+                                        <x-ui.menu>
+                                            <x-slot:trigger><flux:button size="sm">Decision</flux:button></x-slot:trigger>
+                                            @foreach (Submission::DECISIONS as $k => $l)<x-ui.menu-item wire:click="setDecision({{ $sub->id }}, '{{ $k }}')">{{ $l }}</x-ui.menu-item>@endforeach
+                                            @if (! $isCur)<div class="my-1 border-t border-zinc-100 dark:border-zinc-800"></div><x-ui.menu-item wire:click="makeCurrent({{ $sub->id }})">Make current journal</x-ui.menu-item>@endif
+                                        </x-ui.menu>
                                         <flux:button size="sm" variant="ghost" icon="pencil-square" wire:click="editSubmission({{ $sub->id }})" />
                                     </div>
                                 </div>
@@ -690,10 +704,10 @@ new class extends Component {
         @if ($tab === 'files')
             <div class="mb-4 flex items-center justify-between">
                 <div><h2 class="font-semibold">Files</h2><p class="text-xs text-zinc-500">All optional. Upload manuscripts, cover letters, responses or the publisher’s proof PDF.</p></div>
-                <flux:button size="sm" variant="primary" icon="arrow-up-tray" x-on:click="$flux.modal('file-form').show()">Upload</flux:button>
+                <flux:button size="sm" variant="primary" icon="arrow-up-tray" wire:click="openUpload">Upload</flux:button>
             </div>
             @if ($paper->files->isEmpty())
-                <div class="panel"><x-ui.empty title="No files" text="Files are optional. Keep them here if you want the full manuscript and the proof next to the record."><flux:button x-on:click="$flux.modal('file-form').show()">Upload a file</flux:button></x-ui.empty></div>
+                <div class="panel"><x-ui.empty title="No files" text="Files are optional. Keep them here if you want the full manuscript and the proof next to the record."><flux:button wire:click="openUpload">Upload a file</flux:button></x-ui.empty></div>
             @else
                 <div class="stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($paper->files as $f)
@@ -721,6 +735,7 @@ new class extends Component {
 
     {{-- ================= MODALS ================= --}}
     <flux:modal name="paper-form" class="w-full max-w-2xl">
+        @if ($modal === 'paper-form')
         <form wire:submit="savePaper" class="space-y-4">
             <flux:heading size="lg">Edit paper</flux:heading>
             <flux:input wire:model="p.title" label="Title" />
@@ -745,9 +760,11 @@ new class extends Component {
             <flux:textarea wire:model="p.notes" label="Notes" rows="3" />
             <div class="flex justify-end gap-2"><flux:modal.close><flux:button variant="ghost">Cancel</flux:button></flux:modal.close><flux:button type="submit" variant="primary">Save</flux:button></div>
         </form>
+        @endif
     </flux:modal>
 
     <flux:modal name="sub-form" class="w-full max-w-xl">
+        @if ($modal === 'sub-form')
         <form wire:submit="saveSubmission" class="space-y-4">
             <flux:heading size="lg">{{ $subId ? 'Edit submission' : 'Record submission' }}</flux:heading>
             <div class="grid gap-4 sm:grid-cols-2">
@@ -770,18 +787,22 @@ new class extends Component {
                 <div class="flex gap-2"><flux:modal.close><flux:button variant="ghost">Cancel</flux:button></flux:modal.close><flux:button type="submit" variant="primary">Save</flux:button></div>
             </div>
         </form>
+        @endif
     </flux:modal>
 
     <flux:modal name="comments" class="w-full max-w-xl">
+        @if ($modal === 'comments')
         <form wire:submit="importComments" class="space-y-4">
             <flux:heading size="lg">Paste reviewer comments</flux:heading>
             <flux:text>Each paragraph or numbered point becomes one item on the checklist.</flux:text>
             <flux:textarea wire:model="comments" rows="10" placeholder="1. The sampling strategy needs more detail…&#10;2. Please discuss…" />
             <div class="flex justify-end gap-2"><flux:modal.close><flux:button variant="ghost">Cancel</flux:button></flux:modal.close><flux:button type="submit" variant="primary">Add to checklist</flux:button></div>
         </form>
+        @endif
     </flux:modal>
 
     <flux:modal name="file-form" class="w-full max-w-lg">
+        @if ($modal === 'file-form')
         <form wire:submit="saveFile" class="space-y-4">
             <flux:heading size="lg">Upload a file</flux:heading>
             <label class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-zinc-300 p-6 text-center transition hover:border-indigo-400 hover:bg-indigo-50/40 dark:border-zinc-700 dark:hover:bg-indigo-500/5">
@@ -804,6 +825,7 @@ new class extends Component {
             @endif
             <div class="flex justify-end gap-2"><flux:modal.close><flux:button variant="ghost">Cancel</flux:button></flux:modal.close><flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="upload">Upload</flux:button></div>
         </form>
+        @endif
     </flux:modal>
 
     <flux:modal name="preview" class="w-full max-w-5xl !p-0">
@@ -817,6 +839,7 @@ new class extends Component {
     </flux:modal>
 
     <flux:modal name="author-form" class="w-full max-w-xl">
+        @if ($modal === 'author-form')
         <form wire:submit="saveAuthor" class="space-y-4">
             <flux:heading size="lg">{{ $authorId ? 'Edit author' : 'Add author' }}</flux:heading>
             <div class="grid gap-4 sm:grid-cols-2">
@@ -835,5 +858,6 @@ new class extends Component {
                 <div class="flex gap-2"><flux:modal.close><flux:button variant="ghost">Cancel</flux:button></flux:modal.close><flux:button type="submit" variant="primary">Save</flux:button></div>
             </div>
         </form>
+        @endif
     </flux:modal>
 </div>

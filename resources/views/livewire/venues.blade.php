@@ -19,6 +19,7 @@ new #[Title('Venues')] class extends Component {
     public string $field = '';
 
     public ?int $editingId = null;
+    public bool $formOpen = false;
     public array $form = [];
 
     private const FIELDS = ['name', 'kind', 'field', 'publisher', 'rank', 'quartile', 'acceptance_rate', 'first_decision', 'proceedings',
@@ -45,6 +46,7 @@ new #[Title('Venues')] class extends Component {
         $this->editingId = null;
         $this->blankForm();
         $this->resetValidation();
+        $this->formOpen = true;
         Flux::modal('venue-form')->show();
     }
 
@@ -54,6 +56,7 @@ new #[Title('Venues')] class extends Component {
         $this->editingId = $v->id;
         $this->form = collect(self::FIELDS)->mapWithKeys(fn ($f) => [$f => $f === 'deadline_on' ? $v->deadline_on?->toDateString() : $v->$f])->all();
         $this->resetValidation();
+        $this->formOpen = true;
         Flux::modal('venue-form')->show();
     }
 
@@ -317,18 +320,15 @@ new #[Title('Venues')] class extends Component {
                                 <h3 class="text-sm leading-snug font-semibold">{{ $v->name }}</h3>
                                 <p class="mt-0.5 text-xs text-zinc-500">{{ collect([$v->publisher, $v->field])->filter()->implode(' · ') }}</p>
                             </div>
-                            <flux:dropdown align="end" class="shrink-0 sm:hidden">
-                                <flux:button size="xs" variant="ghost" icon="ellipsis-horizontal" />
-                                <flux:menu>
-                                    <flux:menu.item :icon="$v->watch ? 'bell-slash' : 'bell'" wire:click="toggleWatch({{ $v->id }})">{{ $v->watch ? 'Stop watching' : 'Watch weekly' }}</flux:menu.item>
-                                    @if ($aiReady)<flux:menu.item icon="sparkles" x-on:click="single({{ $v->id }})">Update with AI</flux:menu.item>@endif
-                                    <flux:menu.item icon="pencil-square" wire:click="edit({{ $v->id }})">Edit</flux:menu.item>
-                                </flux:menu>
-                            </flux:dropdown>
+                            <x-ui.menu class="shrink-0 sm:hidden">
+                                <x-ui.menu-item wire:click="toggleWatch({{ $v->id }})">{{ $v->watch ? 'Stop watching' : 'Watch weekly' }}</x-ui.menu-item>
+                                @if ($aiReady)<x-ui.menu-item x-on:click="single({{ $v->id }})">Update with AI</x-ui.menu-item>@endif
+                                <x-ui.menu-item wire:click="edit({{ $v->id }})">Edit</x-ui.menu-item>
+                            </x-ui.menu>
                             <div class="hidden shrink-0 items-center opacity-60 transition group-hover:opacity-100 sm:flex">
-                                <flux:button size="xs" variant="ghost" :icon="$v->watch ? 'bell-alert' : 'bell'" wire:click="toggleWatch({{ $v->id }})" :tooltip="$v->watch ? 'Watched: updated weekly' : 'Watch for weekly updates'" class="{{ $v->watch ? '!text-indigo-600 dark:!text-indigo-400' : '' }}" />
-                                <flux:button size="xs" variant="ghost" icon="sparkles" x-on:click="single({{ $v->id }})" ::disabled="busy[{{ $v->id }}] || run" :disabled="! $aiReady" tooltip="Update with AI" />
-                                <flux:button size="xs" variant="ghost" icon="pencil-square" wire:click="edit({{ $v->id }})" tooltip="Edit" />
+                                <button type="button" wire:click="toggleWatch({{ $v->id }})" title="{{ $v->watch ? 'Watched: updated weekly' : 'Watch for weekly updates' }}" class="inline-flex size-7 items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-800 disabled:opacity-40 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 {{ $v->watch ? '!text-indigo-600 dark:!text-indigo-400' : '' }}"><flux:icon :name="$v->watch ? 'bell-alert' : 'bell'" variant="micro" /></button>
+                                <button type="button" x-on:click="single({{ $v->id }})" :disabled="busy[{{ $v->id }}] || run" @disabled(! $aiReady) title="Update with AI" class="inline-flex size-7 items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-800 disabled:opacity-40 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"><flux:icon.sparkles variant="micro" /></button>
+                                <button type="button" wire:click="edit({{ $v->id }})" title="Edit" class="inline-flex size-7 items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-800 disabled:opacity-40 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"><flux:icon.pencil-square variant="micro" /></button>
                             </div>
                         </div>
 
@@ -375,14 +375,11 @@ new #[Title('Venues')] class extends Component {
                             <p class="text-sm leading-snug font-medium">{{ $v->name }}</p>
                             <p class="mt-0.5 text-xs text-zinc-500">{{ collect([$v->publisher, $v->field])->filter()->implode(' · ') }}</p>
                         </div>
-                        <flux:dropdown align="end">
-                            <flux:button size="xs" variant="ghost" icon="ellipsis-horizontal" />
-                            <flux:menu>
-                                @if ($v->website_url)<flux:menu.item icon="arrow-up-right" :href="$v->website_url" target="_blank">Website</flux:menu.item>@endif
-                                @if ($aiReady)<flux:menu.item icon="sparkles" x-on:click="single({{ $v->id }})">Update with AI</flux:menu.item>@endif
-                                <flux:menu.item icon="pencil-square" wire:click="edit({{ $v->id }})">Edit</flux:menu.item>
-                            </flux:menu>
-                        </flux:dropdown>
+                        <x-ui.menu>
+                            @if ($v->website_url)<x-ui.menu-item :href="$v->website_url" target="_blank">Website</x-ui.menu-item>@endif
+                            @if ($aiReady)<x-ui.menu-item x-on:click="single({{ $v->id }})">Update with AI</x-ui.menu-item>@endif
+                            <x-ui.menu-item wire:click="edit({{ $v->id }})">Edit</x-ui.menu-item>
+                        </x-ui.menu>
                     </div>
                     <dl class="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
                         <div><dt class="text-zinc-400">First decision</dt><dd class="text-zinc-700 dark:text-zinc-300">{{ $v->first_decision ?? '–' }}</dd></div>
@@ -431,9 +428,9 @@ new #[Title('Venues')] class extends Component {
                                 <td class="px-3 py-3 text-xs text-zinc-500">{{ $v->word_limit ?? '–' }}</td>
                                 <td class="px-3 py-3">
                                     <div class="flex items-center justify-end gap-0.5 opacity-50 transition group-hover:opacity-100">
-                                        @if ($v->website_url)<flux:button size="xs" variant="ghost" icon="arrow-up-right" :href="$v->website_url" target="_blank" tooltip="Website" />@endif
-                                        <flux:button size="xs" variant="ghost" icon="sparkles" x-on:click="single({{ $v->id }})" ::disabled="busy[{{ $v->id }}] || run" :disabled="! $aiReady" :tooltip="$v->checked_at ? 'Checked '.$v->checked_at->diffForHumans() : 'Update with AI'" />
-                                        <flux:button size="xs" variant="ghost" icon="pencil-square" wire:click="edit({{ $v->id }})" tooltip="Edit" />
+                                        @if ($v->website_url)<a href="{{ $v->website_url }}" target="_blank" title="Website" class="inline-flex size-7 items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-800 disabled:opacity-40 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"><flux:icon.arrow-up-right variant="micro" /></a>@endif
+                                        <button type="button" x-on:click="single({{ $v->id }})" :disabled="busy[{{ $v->id }}] || run" @disabled(! $aiReady) title="{{ $v->checked_at ? 'Checked '.$v->checked_at->diffForHumans() : 'Update with AI' }}" class="inline-flex size-7 items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-800 disabled:opacity-40 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"><flux:icon.sparkles variant="micro" /></button>
+                                        <button type="button" wire:click="edit({{ $v->id }})" title="Edit" class="inline-flex size-7 items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-800 disabled:opacity-40 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"><flux:icon.pencil-square variant="micro" /></button>
                                     </div>
                                 </td>
                             </tr>
@@ -450,6 +447,7 @@ new #[Title('Venues')] class extends Component {
 
     {{-- Add / edit --}}
     <flux:modal name="venue-form" class="w-full max-w-2xl">
+        @if ($formOpen)
         <form wire:submit="save" class="space-y-5">
             <flux:heading size="lg">{{ $editingId ? 'Edit venue' : 'Add venue' }}</flux:heading>
             <div class="grid gap-4 sm:grid-cols-3">
@@ -507,5 +505,6 @@ new #[Title('Venues')] class extends Component {
                 </div>
             </div>
         </form>
+        @endif
     </flux:modal>
 </div>
