@@ -17,7 +17,7 @@ Follow every manuscript through every journal and conference it is sent to, watc
 
 </div>
 
-![The Papers view: every manuscript with its status, venue trail and review clock, and the selected paper's journey](docs/screenshots/papers.png)
+![A short tour of Manuscript Tracker: the desk, papers, reviewer checklist, venues, calls for papers and citations](docs/demo.gif)
 
 ## Why
 
@@ -179,6 +179,10 @@ Everything specific to a person or a deployment is set in `.env` or in Settings,
 ```bash
 php artisan test
 ```
+
+## Support the project
+
+If Manuscript Tracker saves you time, please give it a ⭐ on GitHub. It helps other researchers find it. Bug reports, ideas and pull requests are welcome in [Issues](https://github.com/naimbh/manuscript-tracker/issues).
 
 ## License
 
