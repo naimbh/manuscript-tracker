@@ -32,7 +32,7 @@ class RecordSubmission extends Tool
         $s = $p->submissions()->create([
             'venue_id' => $venue->id, 'venue_name' => $venue->name, 'manuscript_id' => $request->get('manuscript_id'),
             'submitted_on' => $request->get('submitted_on', now()->toDateString()), 'portal_url' => $request->get('portal_url') ?? $venue->portal_url,
-            'decision' => 'submitted', 'is_current' => true,
+            'decision' => 'submitted', 'is_current' => true, 'note' => $request->get('note'),
         ]);
         $p->queue()->where('venue_id', $venue->id)->delete();
         $p->update(['stage' => 'submitted']);
@@ -49,6 +49,7 @@ class RecordSubmission extends Tool
             'manuscript_id' => $schema->string(),
             'submitted_on' => $schema->string()->description('YYYY-MM-DD. Defaults to today.'),
             'portal_url' => $schema->string(),
+            'note' => $schema->string(),
         ];
     }
 }

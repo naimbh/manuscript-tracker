@@ -10,6 +10,9 @@ use App\Mcp\Tools\ListPublications;
 use App\Mcp\Tools\RecordDecision;
 use App\Mcp\Tools\RecordSubmission;
 use App\Mcp\Tools\SearchVenues;
+use App\Mcp\Tools\AddPaper;
+use App\Mcp\Tools\UpdatePaper;
+use App\Mcp\Tools\UpdateSubmission;
 use App\Models\User;
 use Database\Seeders\DemoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -36,6 +39,29 @@ class McpTest extends TestCase
         $this->assertSame('ITD-1', $sub->manuscript_id);
         TrackerServer::actingAs($user)->tool(RecordDecision::class, ['submission_id' => $sub->id, 'decision' => 'major', 'revision_due_on' => '2027-03-01'])->assertOk();
         $this->assertSame('revision', $paper->fresh()->stage);
+    }
+
+    public function test_agent_tools_add_and_update_papers_and_submissions(): void
+    {
+        $this->seed(DemoSeeder::class);
+        $user = User::where('email', 'demo@example.com')->first();
+
+        TrackerServer::actingAs($user)->tool(AddPaper::class, ['title' => 'A New Study', 'short_title' => 'New', 'method' => 'Thematic analysis', 'tags' => ['Thesis']])->assertOk();
+        $paper = $user->papers()->where('short_title', 'New')->first();
+        $this->assertSame('drafting', $paper->stage);
+        $this->assertSame(['Thesis'], $paper->tags);
+
+        TrackerServer::actingAs($user)->tool(UpdatePaper::class, ['paper_id' => $paper->id, 'stage' => 'ready', 'dataset' => '30 interviews'])->assertOk();
+        $this->assertSame('ready', $paper->fresh()->stage);
+
+        TrackerServer::actingAs($user)->tool(RecordSubmission::class, ['paper_id' => $paper->id, 'venue' => 'Some Journal'])->assertOk();
+        $sub = $paper->fresh()->currentSubmission;
+        $this->assertSame('submitted', $sub->decision);
+        $this->assertSame('submitted', $paper->fresh()->stage);
+
+        TrackerServer::actingAs($user)->tool(UpdateSubmission::class, ['submission_id' => $sub->id, 'manuscript_id' => 'SJ-1', 'status' => 'pending'])->assertOk();
+        $this->assertSame('SJ-1', $sub->fresh()->manuscript_id);
+        $this->assertSame('under_review', $paper->fresh()->stage);
     }
 
     public function test_remote_endpoint_needs_a_token(): void

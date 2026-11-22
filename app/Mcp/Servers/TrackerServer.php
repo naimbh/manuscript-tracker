@@ -16,7 +16,11 @@ class TrackerServer extends Server
     protected array $tools = [
         Tools\ListPapers::class,
         Tools\GetPaper::class,
+        Tools\AddPaper::class,
+        Tools\UpdatePaper::class,
         Tools\RecordSubmission::class,
+        Tools\UpdateSubmission::class,
+        Tools\AttachFile::class,
         Tools\RecordDecision::class,
         Tools\ListDeadlines::class,
         Tools\AddDeadline::class,

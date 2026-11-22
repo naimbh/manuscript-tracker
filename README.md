@@ -128,7 +128,7 @@ The AI is asked to use official pages, to return `null` rather than guess, and t
 
 ## Agent tools (MCP)
 
-Manuscript Tracker includes a [Model Context Protocol](https://modelcontextprotocol.io) server, so AI assistants can work with your tracker. Tools: `list-papers`, `get-paper`, `record-submission`, `record-decision`, `list-deadlines`, `add-deadline`, `search-venues`, `list-opportunities` and `list-publications`.
+Manuscript Tracker includes a [Model Context Protocol](https://modelcontextprotocol.io) server, so AI assistants can work with your tracker. Tools: `list-papers`, `get-paper`, `add-paper`, `update-paper`, `record-submission`, `update-submission`, `record-decision`, `attach-file` (local server only), `list-deadlines`, `add-deadline`, `search-venues`, `list-opportunities` and `list-publications`.
 
 **On the same computer** (Claude Desktop, Claude Code, Cursor): add a server that runs
 
