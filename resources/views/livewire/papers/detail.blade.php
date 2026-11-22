@@ -428,8 +428,17 @@ new class extends Component {
                         $rejections = $chron->filter->isRejection()->count();
                         $ringTone = ['blue' => 'bg-sky-500 ring-sky-100 dark:ring-sky-500/20', 'amber' => 'bg-amber-500 ring-amber-100 dark:ring-amber-500/20', 'red' => 'bg-rose-500 ring-rose-100 dark:ring-rose-500/20', 'green' => 'bg-emerald-500 ring-emerald-100 dark:ring-emerald-500/20', 'zinc' => 'bg-zinc-400 ring-zinc-100 dark:ring-zinc-700'];
                         $iconOf = ['blue' => 'clock', 'amber' => 'pencil', 'red' => 'x-mark', 'green' => 'check', 'zinc' => 'minus'];
+                        $hasPreprint = filled($paper->preprint_server) || filled($paper->preprint_url);
+                        $preprintName = $hasPreprint ? (str($paper->preprint_server ?: 'Preprint')->before(' (')->value()) : null;
+                        // Journey steps: every submission plus the preprint, in date order.
+                        $steps = $chron->map(fn ($x) => ['type' => 'sub', 'sub' => $x, 'date' => $x->submitted_on]);
+                        if ($hasPreprint) {
+                            $steps->push(['type' => 'preprint', 'date' => $paper->preprint_on]);
+                        }
+                        $steps = $steps->sortBy(fn ($x) => [$x['date']?->timestamp ?? PHP_INT_MAX, $x['type'] === 'preprint' ? 1 : 0])->values();
+                        $first = $first ?? $paper->preprint_on;
                     @endphp
-                    @if ($chron->isNotEmpty())
+                    @if ($steps->isNotEmpty())
                         <section class="panel relative overflow-hidden p-4 sm:p-5">
                             <div class="pointer-events-none absolute -top-20 -right-10 size-56 rounded-full bg-gradient-to-br from-indigo-400/15 via-fuchsia-400/10 to-transparent blur-2xl"></div>
                             <div class="relative flex flex-wrap items-baseline justify-between gap-2">
@@ -440,9 +449,18 @@ new class extends Component {
                             {{-- Stepper --}}
                             <div class="relative mt-3 -mx-2 overflow-x-auto px-2 pt-2 pb-1">
                                 <ol class="flex min-w-max items-start">
-                                    @foreach ($chron as $i => $j)
-                                        @php $isCurJ = $cur && $cur->id === $j->id; @endphp
+                                    @foreach ($steps as $i => $step)
                                         <li class="flex items-start">
+                                        @if ($step['type'] === 'preprint')
+                                            <div class="flex w-28 flex-col items-center text-center" style="animation: page-in .4s both {{ $i * 0.08 }}s">
+                                                <span class="relative flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-cyan-500 text-white ring-4 ring-teal-100 dark:ring-teal-500/20"><flux:icon.document-arrow-up variant="mini" class="size-4" /></span>
+                                                <span class="mt-2 line-clamp-2 text-xs leading-tight font-medium text-zinc-700 dark:text-zinc-200">{{ $preprintName }}</span>
+                                                <span class="mt-0.5 text-[10px] text-zinc-400">{{ $paper->preprint_on?->format('M Y') ?? 'date not set' }}</span>
+                                                @if ($paper->preprint_url)<a href="{{ $paper->preprint_url }}" target="_blank" class="mt-1 rounded-full bg-teal-50 px-1.5 py-px text-[10px] font-medium text-teal-700 hover:underline dark:bg-teal-500/10 dark:text-teal-300">Preprint ↗</a>
+                                                @else<span class="mt-1 rounded-full bg-teal-50 px-1.5 py-px text-[10px] font-medium text-teal-700 dark:bg-teal-500/10 dark:text-teal-300">Preprint</span>@endif
+                                            </div>
+                                        @else
+                                        @php $j = $step['sub']; $isCurJ = $cur && $cur->id === $j->id; @endphp
                                             <div class="flex w-28 flex-col items-center text-center" style="animation: page-in .4s both {{ $i * 0.08 }}s">
                                                 <span class="relative flex size-9 items-center justify-center rounded-full text-white ring-4 {{ $ringTone[$j->tone()] }} {{ $isCurJ ? 'shadow-lg shadow-indigo-500/30' : '' }}">
                                                     @if ($isCurJ && $j->decision === 'pending')<span class="absolute inset-0 animate-ping rounded-full bg-sky-400/40"></span>@endif
@@ -452,6 +470,7 @@ new class extends Component {
                                                 <span class="mt-0.5 text-[10px] text-zinc-400">{{ $j->submitted_on?->format('M Y') }}</span>
                                                 <span class="mt-1 rounded-full px-1.5 py-px text-[10px] font-medium {{ ['blue' => 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300', 'amber' => 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300', 'red' => 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300', 'green' => 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300', 'zinc' => 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800'][$j->tone()] }}">{{ Submission::DECISIONS[$j->decision] }}@if ($j->daysInReview() !== null) · {{ $j->daysInReview() }}d @endif</span>
                                             </div>
+                                        @endif
                                             @unless ($loop->last)
                                                 <div class="mt-4 h-0.5 w-6 shrink-0 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700"><div class="grow-x h-full bg-gradient-to-r from-zinc-300 to-indigo-300 dark:from-zinc-600 dark:to-indigo-500" style="animation-delay: {{ 0.1 + $i * 0.08 }}s"></div></div>
                                             @endunless
@@ -470,6 +489,7 @@ new class extends Component {
                                 </ol>
                             </div>
 
+                            @if ($chron->isNotEmpty())
                             {{-- Stat tiles --}}
                             <div class="relative mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
                                 <div class="rounded-xl bg-gradient-to-br from-indigo-50 to-white p-3 ring-1 ring-indigo-100 dark:from-indigo-500/10 dark:to-transparent dark:ring-indigo-500/20">
@@ -487,6 +507,7 @@ new class extends Component {
                                     @else<p class="mt-1 text-sm font-semibold">{{ $cur ? Submission::DECISIONS[$cur->decision] : Paper::STAGES[$paper->stage] }}</p>@endif
                                 </div>
                             </div>
+                            @endif
                         </section>
                     @endif
 
@@ -502,8 +523,14 @@ new class extends Component {
                             <flux:button size="sm" variant="primary" wire:click="newSubmission">Add new journal</flux:button>
                         </div>
                     @endif
-                    @forelse ($paper->submissions->sortByDesc(fn ($x) => $x->id === $cur?->id) as $sub)
+                    @php $preprintShown = false; @endphp
+                    @foreach ($paper->submissions->sortByDesc(fn ($x) => $x->id === $cur?->id) as $sub)
                         @php $c = $sub->clock(); $items = $sub->revisionItems; $doneN = $items->where('done', true)->count(); $isCur = $cur && $cur->id === $sub->id; @endphp
+                        {{-- The preprint sits in date order among the earlier submissions. --}}
+                        @if ($hasPreprint && ! $preprintShown && ! $isCur && $paper->preprint_on && $sub->submitted_on && $paper->preprint_on->gte($sub->submitted_on))
+                            <x-ui.preprint-entry :paper="$paper" />
+                            @php $preprintShown = true; @endphp
+                        @endif
                         <div class="relative pb-5 pl-7 sm:pb-6 sm:pl-8" wire:key="s{{ $sub->id }}">
                             @unless ($loop->last)<span class="absolute top-6 bottom-0 left-[11px] w-px bg-zinc-200 dark:bg-zinc-800"></span>@endunless
                             <span class="absolute top-1.5 left-0 flex size-6 items-center justify-center rounded-full ring-4 ring-[#f7f8fc] dark:ring-zinc-950
@@ -581,10 +608,14 @@ new class extends Component {
                                 @endif
                             </div>
                         </div>
-                    @empty
-                        <div class="panel"><x-ui.empty title="Not submitted yet" text="Record a submission when you send this paper to a venue. The review clock starts from that date.">
+                    @endforeach
+                    @if ($hasPreprint && ! $preprintShown)
+                        <x-ui.preprint-entry :paper="$paper" />
+                    @endif
+                    @if ($paper->submissions->isEmpty())
+                        <div class="panel"><x-ui.empty title="Not submitted to a journal yet" text="Record a submission when you send this paper to a venue. The review clock starts from that date.">
                             <flux:button variant="primary" wire:click="newSubmission">Record submission</flux:button></x-ui.empty></div>
-                    @endforelse
+                    @endif
                     </div>
 
                     <div class="stagger space-y-5">
