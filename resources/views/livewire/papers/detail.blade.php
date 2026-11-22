@@ -46,7 +46,7 @@ new class extends Component {
         $this->openModal('file-form');
     }
 
-    private const PAPER_FIELDS = ['title', 'short_title', 'stage', 'abstract', 'method', 'dataset', 'keywords', 'overleaf_url', 'drive_url', 'preprint_server', 'preprint_url', 'preprint_on', 'notes'];
+    private const PAPER_FIELDS = ['title', 'short_title', 'stage', 'started_on', 'abstract', 'method', 'dataset', 'keywords', 'overleaf_url', 'drive_url', 'preprint_server', 'preprint_url', 'preprint_on', 'notes'];
 
     public function mount(Paper $paper): void
     {
@@ -67,7 +67,7 @@ new class extends Component {
     /* ---------- Paper ---------- */
     public function editPaper(): void
     {
-        $this->p = collect(self::PAPER_FIELDS)->mapWithKeys(fn ($f) => [$f => $f === 'preprint_on' ? $this->paper->preprint_on?->toDateString() : $this->paper->$f])->all();
+        $this->p = collect(self::PAPER_FIELDS)->mapWithKeys(fn ($f) => [$f => in_array($f, ['preprint_on', 'started_on'], true) ? $this->paper->$f?->toDateString() : $this->paper->$f])->all();
         $this->p['tags'] = implode(', ', $this->paper->tags ?? []);
         $this->openModal('paper-form');
     }
@@ -79,7 +79,7 @@ new class extends Component {
             'p.stage' => 'required|in:'.implode(',', array_keys(Paper::STAGES)),
             'p.abstract' => 'nullable|string|max:10000', 'p.method' => 'nullable|string|max:255', 'p.dataset' => 'nullable|string|max:255',
             'p.keywords' => 'nullable|string|max:255', 'p.overleaf_url' => 'nullable|url|max:255', 'p.drive_url' => 'nullable|url|max:255',
-            'p.preprint_server' => 'nullable|string|max:255', 'p.preprint_url' => 'nullable|url|max:255', 'p.preprint_on' => 'nullable|date',
+            'p.preprint_server' => 'nullable|string|max:255', 'p.preprint_url' => 'nullable|url|max:255', 'p.preprint_on' => 'nullable|date', 'p.started_on' => 'nullable|date',
             'p.notes' => 'nullable|string|max:10000', 'p.tags' => 'nullable|string|max:500',
         ])['p'];
         $data['tags'] = collect(explode(',', $data['tags'] ?? ''))->map(fn ($t) => trim($t))->filter()->unique(fn ($t) => mb_strtolower($t))->take(12)->values()->all() ?: null;
@@ -775,6 +775,7 @@ new class extends Component {
                 <flux:select wire:model="p.stage" label="Stage">@foreach (Paper::STAGES as $k => $l)<flux:select.option value="{{ $k }}">{{ $l }}</flux:select.option>@endforeach</flux:select>
                 <flux:input wire:model="p.keywords" label="Keywords" placeholder="comma separated" />
                 <div class="sm:col-span-3"><flux:input wire:model="p.tags" label="Tags" placeholder="Thesis, Preprint" description:trailing="Short labels such as Thesis or Preprint. Topics belong in Keywords." /></div>
+                <flux:input wire:model="p.started_on" type="date" label="Started on" />
                 <flux:input wire:model="p.method" label="Method" />
                 <flux:input wire:model="p.dataset" label="Data" />
             </div>

@@ -18,7 +18,7 @@ new class extends Component {
     public string $sort = 'added';
 
     public const SORTS = [
-        'added' => 'Recently added',
+        'added' => 'Recently started',
         'updated' => 'Recently updated',
         'submitted' => 'Recently submitted',
         'ready' => 'Ready to submit first',
@@ -65,7 +65,7 @@ new class extends Component {
 
     public function with(): array
     {
-        $all = auth()->user()->papers()->with(['currentSubmission.venue', 'queue.venue', 'submissions'])->latest('created_at')->latest('id')->get();
+        $all = auth()->user()->papers()->with(['currentSubmission.venue', 'queue.venue', 'submissions'])->get()->sortByDesc(fn ($p) => [$p->started_on?->timestamp ?? 0, $p->id])->values();
         $groups = [
             'active' => fn ($p) => ! in_array($p->stage, ['published', 'shelved']),
             'review' => fn ($p) => in_array($p->stage, ['submitted', 'under_review', 'revision']),

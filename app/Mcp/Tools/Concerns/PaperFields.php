@@ -15,6 +15,7 @@ trait PaperFields
             'title' => $schema->string(),
             'short_title' => $schema->string()->description('A short name shown in lists, such as “Paper 1”.'),
             'stage' => $schema->string()->enum(array_keys(Paper::STAGES)),
+            'started_on' => $schema->string()->description('YYYY-MM-DD, when work on the paper began. Defaults to today for a new paper.'),
             'abstract' => $schema->string(),
             'keywords' => $schema->string()->description('Separated by semicolons.'),
             'method' => $schema->string()->description('The specific analytic method, at most 255 characters.'),
@@ -33,7 +34,7 @@ trait PaperFields
     protected function paperData(Request $request): array
     {
         $d = [];
-        foreach (['title', 'short_title', 'stage', 'abstract', 'keywords', 'method', 'dataset', 'tags', 'notes', 'overleaf_url', 'drive_url', 'preprint_server', 'preprint_url', 'preprint_on'] as $k) {
+        foreach (['title', 'short_title', 'stage', 'started_on', 'abstract', 'keywords', 'method', 'dataset', 'tags', 'notes', 'overleaf_url', 'drive_url', 'preprint_server', 'preprint_url', 'preprint_on'] as $k) {
             if ($request->get($k) !== null) {
                 $v = $request->get($k);
                 $d[$k] = is_string($v) && in_array($k, ['method', 'dataset', 'short_title'], true) ? mb_substr($v, 0, 255) : $v;

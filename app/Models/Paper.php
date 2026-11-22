@@ -11,7 +11,12 @@ class Paper extends Model
 {
     protected $guarded = ['id', 'user_id'];
 
-    protected $casts = ['preprint_on' => 'date', 'tags' => 'array'];
+    protected $casts = ['preprint_on' => 'date', 'started_on' => 'date', 'tags' => 'array'];
+
+    protected static function booted(): void
+    {
+        static::creating(fn (Paper $p) => $p->started_on ??= today());
+    }
 
     public const STAGES = [
         'idea' => 'Idea',
