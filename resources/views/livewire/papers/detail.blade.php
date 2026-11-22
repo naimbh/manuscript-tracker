@@ -375,14 +375,14 @@ new class extends Component {
             <div class="min-w-0">
                 <div class="flex flex-wrap items-center gap-2">
                     <flux:dropdown>
-                        <button class="rounded-full border border-zinc-200 px-2.5 py-0.5 transition hover:border-indigo-300 dark:border-zinc-700"><x-ui.stage :stage="$paper->stage" /></button>
+                        <button class="inline-flex h-6 items-center rounded-full border border-zinc-200 px-2.5 transition hover:border-indigo-300 dark:border-zinc-700"><x-ui.stage :stage="$paper->stage" /></button>
                         <flux:menu>
                             @foreach (Paper::STAGES as $k => $l)<flux:menu.item wire:click="setStage('{{ $k }}')">{{ $l }}</flux:menu.item>@endforeach
                         </flux:menu>
                     </flux:dropdown>
                     @if ($cur && ! ($paper->stage === Submission::stageFor($cur->decision) && in_array($paper->stage, ['submitted', 'under_review'])))<x-ui.decision :s="$cur" />@endif
                     @if ($paper->short_title)<span class="text-xs text-zinc-400">{{ $paper->short_title }}</span>@endif
-                    @foreach ($paper->tags ?? [] as $t)<a href="{{ route('papers.index', ['q' => '#'.$t]) }}" wire:navigate><x-ui.tag :tag="$t" /></a>@endforeach
+                    @foreach ($paper->tags ?? [] as $t)<a href="{{ route('papers.index', ['q' => '#'.$t]) }}" wire:navigate class="inline-flex"><x-ui.tag :tag="$t" class="h-6 px-2.5" /></a>@endforeach
                 </div>
                 <h1 class="mt-2 max-w-4xl text-lg leading-snug font-semibold tracking-tight text-balance sm:text-xl lg:text-[1.6rem]">{{ $paper->title }}</h1>
                 @if ($paper->method)<p class="mt-1 text-sm text-zinc-500">{{ $paper->method }}</p>@endif

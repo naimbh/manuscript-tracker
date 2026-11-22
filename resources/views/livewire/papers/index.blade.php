@@ -14,6 +14,18 @@ new class extends Component {
     #[Url(except: 'active')]
     public string $filter = 'active';
 
+    #[Url(except: 'added')]
+    public string $sort = 'added';
+
+    public const SORTS = [
+        'added' => 'Recently added',
+        'updated' => 'Recently updated',
+        'submitted' => 'Recently submitted',
+        'ready' => 'Ready to submit first',
+        'stage' => 'By stage',
+        'title' => 'Title (A–Z)',
+    ];
+
     public function mount(?Paper $paper = null): void
     {
         if ($paper?->exists) {
@@ -36,9 +48,24 @@ new class extends Component {
         $view->title($this->paper?->displayTitle() ?? 'Papers');
     }
 
+    private function sorted($list)
+    {
+        $stages = array_flip(array_keys(Paper::STAGES));
+
+        return match ($this->sort) {
+            'updated' => $list->sortByDesc(fn ($p) => $p->updated_at?->timestamp),
+            'submitted' => $list->sortByDesc(fn ($p) => $p->submissions->max(fn ($s) => $s->submitted_on?->timestamp ?? 0)),
+            // Ready-to-submit papers first; the rest keep the newest-first order.
+            'ready' => $list->sortBy(fn ($p) => $p->stage === 'ready' ? 0 : 1),
+            'stage' => $list->sortBy(fn ($p) => $stages[$p->stage] ?? 99),
+            'title' => $list->sortBy(fn ($p) => mb_strtolower($p->displayTitle())),
+            default => $list,
+        };
+    }
+
     public function with(): array
     {
-        $all = auth()->user()->papers()->with(['currentSubmission.venue', 'queue.venue', 'submissions'])->latest('updated_at')->get();
+        $all = auth()->user()->papers()->with(['currentSubmission.venue', 'queue.venue', 'submissions'])->latest('created_at')->latest('id')->get();
         $groups = [
             'active' => fn ($p) => ! in_array($p->stage, ['published', 'shelved']),
             'review' => fn ($p) => in_array($p->stage, ['submitted', 'under_review', 'revision']),
@@ -56,8 +83,7 @@ new class extends Component {
 
         return [
             'tags' => $all->flatMap(fn ($p) => $p->tags ?? [])->unique(fn ($t) => mb_strtolower($t))->sort()->values(),
-            // Ready-to-submit papers first; the rest keep their most-recent order.
-            'list' => $list->sortBy(fn ($p) => $p->stage === 'ready' ? 0 : 1)->values(),
+            'list' => $this->sorted($list)->values(),
             'counts' => collect($groups)->map(fn ($f) => $all->filter($f)->count()),
         ];
     }
@@ -84,6 +110,17 @@ new class extends Component {
                     </button>
                 @endforeach
             </div>
+                <flux:dropdown align="end">
+                    <button title="Sort: {{ self::SORTS[$sort] ?? '' }}" class="flex h-full items-center gap-1 rounded-lg px-2.5 text-xs font-medium transition {{ $sort !== 'added' ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300' : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800' }}">
+                        <flux:icon.arrows-up-down variant="micro" class="size-3.5" /><span class="sr-only">Sort</span>
+                    </button>
+                    <flux:menu>
+                        <flux:menu.heading>Sort by</flux:menu.heading>
+                        @foreach (self::SORTS as $k => $label)
+                            <flux:menu.item wire:click="$set('sort', '{{ $k }}')" :icon="$sort === $k ? 'check' : null" :class="$sort === $k ? '' : 'ps-9'">{{ $label }}</flux:menu.item>
+                        @endforeach
+                    </flux:menu>
+                </flux:dropdown>
                 @if ($tags->isNotEmpty())
                     <flux:dropdown align="end">
                         <button class="flex h-full items-center gap-1 rounded-lg px-2.5 text-xs font-medium transition {{ str_starts_with($q, '#') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300' : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800' }}">
@@ -98,7 +135,7 @@ new class extends Component {
             </div>
         </div>
 
-        <nav class="stagger flex-1 space-y-2 overflow-y-auto p-3" wire:loading.class="opacity-60" wire:target="q,filter">
+        <nav class="stagger flex-1 space-y-2 overflow-y-auto p-3" wire:loading.class="opacity-60" wire:target="q,filter,sort">
             @forelse ($list as $p)
                 @php
                     $cur = $p->currentSubmission; $clock = $cur?->clock(); $next = $p->queue->first();
