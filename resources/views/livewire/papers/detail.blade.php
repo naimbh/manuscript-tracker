@@ -108,7 +108,7 @@ new class extends Component {
         $this->subId = null;
         $v = $venueId ? auth()->user()->venues()->find($venueId) : null;
         $this->s = ['venue_id' => $v?->id ?? '', 'venue_name' => $v?->name ?? '', 'manuscript_id' => '', 'portal_url' => $v?->portal_url ?? '',
-            'submitted_on' => today()->toDateString(), 'status_on' => '', 'decision' => 'submitted', 'decision_on' => '', 'revision_due_on' => '', 'note' => ''];
+            'submitted_on' => today()->toDateString(), 'status_on' => '', 'decision' => 'submitted', 'decision_on' => '', 'revision_due_on' => '', 'note' => '', 'is_current' => true];
         $this->resetValidation();
         $this->openModal('sub-form');
     }
@@ -119,7 +119,7 @@ new class extends Component {
         $this->subId = $sub->id;
         $this->s = ['venue_id' => $sub->venue_id ?? '', 'venue_name' => $sub->venue_name, 'manuscript_id' => $sub->manuscript_id, 'portal_url' => $sub->portal_url,
             'submitted_on' => $sub->submitted_on?->toDateString(), 'status_on' => $sub->status_on?->toDateString(), 'decision' => $sub->decision, 'decision_on' => $sub->decision_on?->toDateString(),
-            'revision_due_on' => $sub->revision_due_on?->toDateString(), 'note' => $sub->note];
+            'revision_due_on' => $sub->revision_due_on?->toDateString(), 'note' => $sub->note, 'is_current' => $sub->id === $this->paper->currentSubmission()->first()?->id];
         $this->resetValidation();
         $this->openModal('sub-form');
     }
@@ -137,7 +137,7 @@ new class extends Component {
         $d = $this->validate([
             's.venue_id' => 'nullable', 's.venue_name' => 'required|string|max:255', 's.manuscript_id' => 'nullable|string|max:255',
             's.portal_url' => 'nullable|url|max:255', 's.submitted_on' => 'nullable|date', 's.status_on' => 'nullable|date', 's.decision' => 'required|in:'.implode(',', array_keys(Submission::DECISIONS)),
-            's.decision_on' => 'nullable|date', 's.revision_due_on' => 'nullable|date', 's.note' => 'nullable|string|max:5000',
+            's.decision_on' => 'nullable|date', 's.revision_due_on' => 'nullable|date', 's.note' => 'nullable|string|max:5000', 's.is_current' => 'boolean',
         ])['s'];
         $d = array_map(fn ($v) => $v === '' ? null : $v, $d);
         $venue = $d['venue_id'] ? auth()->user()->venues()->find($d['venue_id']) : auth()->user()->venues()->firstOrCreate(['name' => $d['venue_name']]);
@@ -146,10 +146,11 @@ new class extends Component {
             $d['decision_on'] = today()->toDateString();
         }
 
-        if (! $this->subId) {
+        $d['is_current'] = (bool) ($d['is_current'] ?? false);
+        if ($d['is_current']) {
             $this->paper->submissions()->update(['is_current' => false]);
-            $d['is_current'] = true;
         }
+        $this->paper->unsetRelation('currentSubmission');
         $sub = $this->subId ? tap($this->paper->submissions()->findOrFail($this->subId))->update($d) : $this->paper->submissions()->create($d);
         $this->paper->queue()->where('venue_id', $sub->venue_id)->delete();
         $this->syncStage($sub->fresh());
@@ -546,7 +547,8 @@ new class extends Component {
                                             @if ($sub->daysInReview() !== null) · <span class="num">{{ $sub->daysInReview() }}</span> days @endif
                                         </p>
                                     </div>
-                                    <div class="flex items-center gap-1">
+                                    <div class="flex flex-wrap items-center gap-1">
+                                        @unless ($isCur)<flux:button size="sm" variant="ghost" icon="star" wire:click="makeCurrent({{ $sub->id }})" title="Make this the paper’s current journal">Set as current</flux:button>@endunless
                                         @if ($sub->portal_url)<flux:button size="sm" variant="{{ $isCur ? 'primary' : 'filled' }}" icon-trailing="arrow-up-right" :href="$sub->portal_url" target="_blank">Open portal</flux:button>@endif
                                         <x-ui.menu>
                                             <x-slot:trigger><flux:button size="sm">Decision</flux:button></x-slot:trigger>
@@ -810,6 +812,7 @@ new class extends Component {
                 @if (! in_array($s['decision'] ?? 'submitted', Submission::WAITING, true))<flux:input wire:model="s.decision_on" type="date" label="Decision on" />@endif
                 @if (in_array($s['decision'] ?? '', ['major', 'minor']))<flux:input wire:model="s.revision_due_on" type="date" label="Revision due" />@endif
             </div>
+            <flux:checkbox wire:model="s.is_current" label="Current journal" description="The journal that has this paper now. Its status sets the paper’s stage, and it is listed first." />
             <flux:textarea wire:model="s.note" label="Note" rows="2" placeholder="Editor’s comments, reasons for the decision…" />
             <div class="flex items-center justify-between">
                 <div>@if ($subId)<flux:button variant="ghost" class="!text-rose-600" wire:click="deleteSubmission" wire:confirm="Remove this submission from the history?">Remove</flux:button>@endif</div>
