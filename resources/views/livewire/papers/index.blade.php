@@ -147,10 +147,10 @@ new class extends Component {
                         'red' => 'before:bg-rose-500 bg-rose-50/50 hover:bg-rose-50 dark:bg-rose-500/[.06] dark:hover:bg-rose-500/10',
                         'green' => 'before:bg-emerald-500 bg-emerald-50/60 hover:bg-emerald-50 dark:bg-emerald-500/[.06] dark:hover:bg-emerald-500/10',
                         'violet' => 'before:bg-violet-500 bg-violet-50/60 hover:bg-violet-50 dark:bg-violet-500/[.06] dark:hover:bg-violet-500/10',
-                        'zinc' => 'before:bg-zinc-300 bg-white/80 hover:bg-white dark:bg-zinc-900 dark:hover:bg-zinc-800/60',
+                        'zinc' => 'before:bg-zinc-300 bg-white/80 hover:bg-white dark:bg-zinc-900 dark:hover:bg-zinc-800/60', 'indigo' => 'before:bg-indigo-500 bg-indigo-50/60 hover:bg-indigo-50 dark:bg-indigo-500/[.06] dark:hover:bg-indigo-500/10', 'fuchsia' => 'before:bg-fuchsia-500 bg-fuchsia-50/60 hover:bg-fuchsia-50 dark:bg-fuchsia-500/[.06] dark:hover:bg-fuchsia-500/10', 'teal' => 'before:bg-teal-500 bg-teal-50/60 hover:bg-teal-50 dark:bg-teal-500/[.06] dark:hover:bg-teal-500/10', 'orange' => 'before:bg-orange-500 bg-orange-50/60 hover:bg-orange-50 dark:bg-orange-500/[.06] dark:hover:bg-orange-500/10',
                     ][$tone];
                     $trail = $p->submissions->sortBy(fn ($x) => [$x->submitted_on?->timestamp ?? 0, $x->id])->values();
-                    $dot = ['blue' => 'bg-sky-500', 'amber' => 'bg-amber-500', 'red' => 'bg-rose-500', 'green' => 'bg-emerald-500', 'zinc' => 'bg-zinc-400'];
+                    $dot = ['blue' => 'bg-sky-500', 'amber' => 'bg-amber-500', 'red' => 'bg-rose-500', 'green' => 'bg-emerald-500', 'zinc' => 'bg-zinc-400', 'indigo' => 'bg-indigo-500', 'fuchsia' => 'bg-fuchsia-500', 'teal' => 'bg-teal-500', 'orange' => 'bg-orange-500'];
                 @endphp
                 <a href="{{ route('papers.index', $p) }}" wire:navigate.hover wire:key="p{{ $p->id }}"
                    class="group relative block overflow-hidden rounded-xl py-3 pr-3 pl-4 transition before:absolute before:inset-y-0 before:left-0 before:w-1 {{ $tint }}

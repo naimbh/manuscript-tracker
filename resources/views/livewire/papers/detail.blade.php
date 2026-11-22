@@ -425,8 +425,8 @@ new class extends Component {
                         $chron = $paper->submissions->sortBy(fn ($x) => [$x->submitted_on?->timestamp ?? 0, $x->id])->values();
                         $first = $chron->first()?->submitted_on;
                         $rejections = $chron->filter->isRejection()->count();
-                        $ringTone = ['blue' => 'bg-sky-500 ring-sky-100 dark:ring-sky-500/20', 'amber' => 'bg-amber-500 ring-amber-100 dark:ring-amber-500/20', 'red' => 'bg-rose-500 ring-rose-100 dark:ring-rose-500/20', 'green' => 'bg-emerald-500 ring-emerald-100 dark:ring-emerald-500/20', 'zinc' => 'bg-zinc-400 ring-zinc-100 dark:ring-zinc-700'];
-                        $iconOf = ['blue' => 'clock', 'amber' => 'pencil', 'red' => 'x-mark', 'green' => 'check', 'zinc' => 'minus'];
+                        $ringTone = ['blue' => 'bg-sky-500 ring-sky-100 dark:ring-sky-500/20', 'amber' => 'bg-amber-500 ring-amber-100 dark:ring-amber-500/20', 'red' => 'bg-rose-500 ring-rose-100 dark:ring-rose-500/20', 'green' => 'bg-emerald-500 ring-emerald-100 dark:ring-emerald-500/20', 'zinc' => 'bg-zinc-400 ring-zinc-100 dark:ring-zinc-700', 'indigo' => 'bg-indigo-500 ring-indigo-100 dark:ring-indigo-500/20', 'fuchsia' => 'bg-fuchsia-500 ring-fuchsia-100 dark:ring-fuchsia-500/20', 'teal' => 'bg-teal-500 ring-teal-100 dark:ring-teal-500/20', 'orange' => 'bg-orange-500 ring-orange-100 dark:ring-orange-500/20'];
+                        $iconOf = ['blue' => 'clock', 'amber' => 'pencil', 'red' => 'x-mark', 'green' => 'check', 'zinc' => 'minus', 'indigo' => 'paper-airplane', 'fuchsia' => 'user', 'teal' => 'scale', 'orange' => 'arrow-uturn-left'];
                         $hasPreprint = filled($paper->preprint_server) || filled($paper->preprint_url);
                         $preprintName = $hasPreprint ? (str($paper->preprint_server ?: 'Preprint')->before(' (')->value()) : null;
                         // Journey steps: every submission plus the preprint, in date order.
@@ -467,7 +467,7 @@ new class extends Component {
                                                 </span>
                                                 <span class="mt-2 line-clamp-2 text-xs leading-tight font-medium {{ $isCurJ ? 'text-zinc-900 dark:text-white' : 'text-zinc-600 dark:text-zinc-300' }}">{{ str($j->venue_name)->before(' (') }}</span>
                                                 <span class="mt-0.5 text-[10px] text-zinc-400">{{ $j->submitted_on?->format('M Y') }}</span>
-                                                <span class="mt-1 rounded-full px-1.5 py-px text-[10px] font-medium {{ ['blue' => 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300', 'amber' => 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300', 'red' => 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300', 'green' => 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300', 'zinc' => 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800'][$j->tone()] }}">{{ Submission::DECISIONS[$j->decision] }}@if ($j->daysInReview() !== null) · {{ $j->daysInReview() }}d @endif</span>
+                                                <span class="mt-1 rounded-full px-1.5 py-px text-[10px] font-medium {{ ['blue' => 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300', 'amber' => 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300', 'red' => 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300', 'green' => 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300', 'zinc' => 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800', 'indigo' => 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300', 'fuchsia' => 'bg-fuchsia-50 text-fuchsia-700 dark:bg-fuchsia-500/10 dark:text-fuchsia-300', 'teal' => 'bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300', 'orange' => 'bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300'][$j->tone()] }}">{{ Submission::DECISIONS[$j->decision] }}@if ($j->daysInReview() !== null) · {{ $j->daysInReview() }}d @endif</span>
                                             </div>
                                         @endif
                                             @unless ($loop->last)
@@ -533,8 +533,8 @@ new class extends Component {
                         <div class="relative pb-5 pl-7 sm:pb-6 sm:pl-8" wire:key="s{{ $sub->id }}">
                             @unless ($loop->last)<span class="absolute top-6 bottom-0 left-[11px] w-px bg-zinc-200 dark:bg-zinc-800"></span>@endunless
                             <span class="absolute top-1.5 left-0 flex size-6 items-center justify-center rounded-full ring-4 ring-[#f7f8fc] dark:ring-zinc-950
-                                {{ ['blue' => 'bg-sky-500', 'amber' => 'bg-amber-500', 'red' => 'bg-rose-500', 'green' => 'bg-emerald-500', 'zinc' => 'bg-zinc-400'][$sub->tone()] }} text-white">
-                                <flux:icon :name="['blue' => 'clock', 'amber' => 'pencil', 'red' => 'x-mark', 'green' => 'check', 'zinc' => 'minus'][$sub->tone()]" variant="micro" class="size-3.5" />
+                                {{ ['blue' => 'bg-sky-500', 'amber' => 'bg-amber-500', 'red' => 'bg-rose-500', 'green' => 'bg-emerald-500', 'zinc' => 'bg-zinc-400', 'indigo' => 'bg-indigo-500', 'fuchsia' => 'bg-fuchsia-500', 'teal' => 'bg-teal-500', 'orange' => 'bg-orange-500'][$sub->tone()] }} text-white">
+                                <flux:icon :name="['blue' => 'clock', 'amber' => 'pencil', 'red' => 'x-mark', 'green' => 'check', 'zinc' => 'minus', 'indigo' => 'paper-airplane', 'fuchsia' => 'user', 'teal' => 'scale', 'orange' => 'arrow-uturn-left'][$sub->tone()]" variant="micro" class="size-3.5" />
                             </span>
                             <div class="panel p-4 {{ $isCur ? 'ring-1 ring-indigo-200 dark:ring-indigo-500/30' : '' }}">
                                 <div class="flex flex-wrap items-start justify-between gap-3">

@@ -108,7 +108,10 @@ class Submission extends Model
             'minor', 'major' => 'amber',
             'desk_reject', 'reject' => 'red',
             'withdrawn' => 'zinc',
-            'returned' => 'amber',
+            'submitted' => 'indigo',
+            'with_editor' => 'fuchsia',
+            'awaiting_decision' => 'teal',
+            'returned' => 'orange',
             default => 'blue',
         };
     }

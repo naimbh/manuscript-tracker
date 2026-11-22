@@ -124,7 +124,7 @@ new #[Title('Desk')] class extends Component {
                     <span class="num text-xs text-zinc-400">{{ $attention->count() }}</span>
                 </div>
                 @forelse ($attention as $a)
-                    @php $tones = ['red' => 'bg-rose-500/10 text-rose-600 dark:text-rose-400', 'amber' => 'bg-amber-500/10 text-amber-600 dark:text-amber-400', 'indigo' => 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400', 'violet' => 'bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white shadow-sm shadow-violet-500/30']; @endphp
+                    @php $tones = ['red' => 'bg-rose-500/10 text-rose-600 dark:text-rose-400', 'amber' => 'bg-amber-500/10 text-amber-600 dark:text-amber-400', 'indigo' => 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400', 'fuchsia' => 'bg-gradient-to-br from-fuchsia-600 to-fuchsia-600 text-white shadow-sm shadow-fuchsia-500/30']; @endphp
                     <div class="stagger">
                         <div class="flex items-start gap-3 border-t border-zinc-100 py-3 first:border-0 dark:border-zinc-800 {{ $a['tone'] === 'violet' ? '-mx-2 rounded-xl border-transparent bg-violet-50/70 px-2 ring-1 ring-violet-200 dark:bg-violet-500/10 dark:ring-violet-500/30' : '' }}">
                             <span class="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg {{ $tones[$a['tone']] }}">
@@ -228,7 +228,7 @@ new #[Title('Desk')] class extends Component {
                                 <a href="{{ route('papers.index', $lane['paper']) }}" wire:navigate class="w-24 shrink-0 truncate pr-2 text-[11px] font-medium hover:text-indigo-600 sm:w-36 sm:pr-3 sm:text-xs">{{ $lane['paper']->displayTitle() }}</a>
                                 <div class="relative h-6 flex-1 rounded-md bg-zinc-50 dark:bg-zinc-800/40">
                                     @foreach ($lane['bars'] as $b)
-                                        @php $col = ['blue' => 'bg-gradient-to-r from-sky-400 to-sky-500', 'amber' => 'bg-gradient-to-r from-amber-400 to-amber-500', 'red' => 'bg-gradient-to-r from-rose-400 to-rose-500', 'green' => 'bg-gradient-to-r from-emerald-400 to-emerald-500', 'zinc' => 'bg-zinc-300 dark:bg-zinc-600'][$b['s']->tone()]; @endphp
+                                        @php $col = ['blue' => 'bg-gradient-to-r from-sky-400 to-sky-500', 'amber' => 'bg-gradient-to-r from-amber-400 to-amber-500', 'red' => 'bg-gradient-to-r from-rose-400 to-rose-500', 'green' => 'bg-gradient-to-r from-emerald-400 to-emerald-500', 'zinc' => 'bg-zinc-300 dark:bg-zinc-600', 'indigo' => 'bg-gradient-to-r from-indigo-400 to-indigo-500', 'fuchsia' => 'bg-gradient-to-r from-fuchsia-400 to-fuchsia-500', 'teal' => 'bg-gradient-to-r from-teal-400 to-teal-500', 'orange' => 'bg-gradient-to-r from-orange-400 to-orange-500'][$b['s']->tone()]; @endphp
                                         <div class="grow-x group absolute top-1 h-4 rounded {{ $col }} shadow-sm" style="left: {{ $b['x'] }}%; width: {{ min($b['w'], 100 - $b['x']) }}%; animation-delay: {{ 0.1 + $i * 0.08 }}s">
                                             <span class="pointer-events-none absolute bottom-full left-0 mb-1 hidden whitespace-nowrap rounded-md bg-zinc-900 px-2 py-1 text-[11px] text-white shadow-lg group-hover:block dark:bg-white dark:text-zinc-900">
                                                 {{ $b['s']->venue_name }} · {{ \App\Models\Submission::DECISIONS[$b['s']->decision] }} · {{ $b['s']->daysInReview() }} days
