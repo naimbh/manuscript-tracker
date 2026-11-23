@@ -46,7 +46,7 @@ class AiRun extends Model
     {
         $this->note($error ? 'Failed: '.$error : 'Finished');
         $this->update(['status' => $error ? 'failed' : 'done', 'error' => $error ? mb_substr($error, 0, 600) : null,
-            'finished_at' => now(), 'done' => $error ? $this->done : max($this->done, $this->total)]);
+            'finished_at' => now(), 'done' => $error ? (int) $this->done : max((int) $this->done, (int) $this->total)]);
 
         return $this;
     }
