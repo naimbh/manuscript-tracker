@@ -21,6 +21,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('files/{file}', [FileController::class, 'show'])->name('files.show');
     Route::get('files/{file}/download', [FileController::class, 'download'])->name('files.download');
     Route::get('export.json', [DataController::class, 'export'])->name('data.export');
+    Route::get('export.zip', [DataController::class, 'exportZip'])->name('data.export.zip');
 
     Route::redirect('settings', 'settings/profile');
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');

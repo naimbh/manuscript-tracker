@@ -14,15 +14,15 @@ new #[Title('Backup & calendar')] class extends Component {
 
     public function import(): void
     {
-        $this->validate(['backup' => 'required|file|mimetypes:application/json,text/plain|max:20480']);
-        $data = json_decode(file_get_contents($this->backup->getRealPath()), true);
-        if (! is_array($data) || ($data['app'] ?? null) !== 'manuscript-tracker') {
-            $this->addError('backup', 'This is not a Manuscript Tracker backup.');
+        $this->validate(['backup' => 'required|file|mimetypes:application/json,text/plain,application/zip,application/x-zip-compressed|max:512000']);
+        try {
+            $n = Backup::importFile(auth()->user(), $this->backup->getRealPath());
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            $this->addError('backup', $e->getMessage());
             return;
         }
-        $n = Backup::import(auth()->user(), $data);
         $this->reset('backup');
-        Flux::toast(variant: 'success', text: "Imported {$n['papers']} papers and {$n['venues']} new venues.");
+        Flux::toast(variant: 'success', text: Backup::summary($n));
     }
 
     public function resetToken(): void
@@ -53,13 +53,17 @@ new #[Title('Backup & calendar')] class extends Component {
             <flux:separator />
             <div class="space-y-3">
                 <flux:heading>Backup</flux:heading>
-                <flux:text>A JSON file with your papers, submissions, venues, authors, checklists and deadlines. Uploaded files are not included.</flux:text>
-                <flux:button icon="arrow-down-tray" :href="route('data.export')">Export JSON</flux:button>
+                <flux:text>Everything in your account: papers, submissions, venues, authors, checklists, deadlines, publications, calls for papers, your profile and site settings. API keys and passwords are never included.</flux:text>
+                <div class="flex flex-wrap gap-2">
+                    <flux:button icon="arrow-down-tray" :href="route('data.export.zip')">Download backup (.zip with files)</flux:button>
+                    <flux:button icon="arrow-down-tray" variant="ghost" :href="route('data.export')">Download data only (.json)</flux:button>
+                </div>
+                <flux:text size="sm">The .zip also holds your uploaded files. You can import either file here or in the desktop app.</flux:text>
             </div>
             <form wire:submit="import" class="space-y-3">
                 <flux:heading>Import</flux:heading>
-                <flux:text>Adds the backup’s records to this account. Nothing existing is deleted.</flux:text>
-                <input type="file" wire:model="backup" accept=".json,application/json" class="block text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-zinc-100 file:px-3 file:py-2 file:text-sm file:font-medium dark:file:bg-zinc-800" />
+                <flux:text>Choose a .zip or .json backup. Its records are added to this account, and nothing existing is deleted. Calls for papers you already have are skipped, and only empty profile fields are filled.</flux:text>
+                <input type="file" wire:model="backup" accept=".json,.zip,application/json,application/zip" class="block text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-zinc-100 file:px-3 file:py-2 file:text-sm file:font-medium dark:file:bg-zinc-800" />
                 @error('backup')<p class="text-sm text-rose-600">{{ $message }}</p>@enderror
                 <flux:button type="submit" variant="primary" wire:loading.attr="disabled">Import backup</flux:button>
             </form>
