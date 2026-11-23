@@ -439,7 +439,7 @@ new class extends Component {
                     @endphp
                     @if ($steps->isNotEmpty())
                         <section class="panel relative overflow-hidden p-4 sm:p-5">
-                            <div class="pointer-events-none absolute -top-20 -right-10 size-56 rounded-full bg-gradient-to-br from-indigo-400/15 via-fuchsia-400/10 to-transparent blur-2xl"></div>
+                            <div class="pointer-events-none absolute -top-20 -right-10 size-56 rounded-full bg-gradient-to-br from-indigo-400/10 via-fuchsia-400/5 to-transparent blur-2xl"></div>
                             <div class="relative flex flex-wrap items-baseline justify-between gap-2">
                                 <h2 class="font-semibold">Journey</h2>
                                 <span class="text-xs text-zinc-500">{{ $first ? 'First sent '.$first->format('j M Y') : '' }}</span>
@@ -461,13 +461,13 @@ new class extends Component {
                                         @else
                                         @php $j = $step['sub']; $isCurJ = $cur && $cur->id === $j->id; @endphp
                                             <div class="flex w-28 flex-col items-center text-center" style="animation: page-in .4s both {{ $i * 0.08 }}s">
-                                                <span class="relative flex size-9 items-center justify-center rounded-full text-white ring-4 {{ $ringTone[$j->tone()] }} {{ $isCurJ ? 'shadow-lg shadow-indigo-500/30' : '' }}">
+                                                <span class="relative flex size-9 items-center justify-center rounded-full text-white ring-4 {{ $ringTone[$j->tone()] }} {{ $isCurJ ? 'shadow-lg shadow-indigo-500/30' : 'opacity-60' }}">
                                                     @if ($isCurJ && $j->isWaiting())<span class="absolute inset-0 animate-ping rounded-full bg-sky-400/40"></span>@endif
                                                     <flux:icon :name="$iconOf[$j->tone()]" variant="mini" class="relative size-4" />
                                                 </span>
                                                 <span class="mt-2 line-clamp-2 text-xs leading-tight font-medium {{ $isCurJ ? 'text-zinc-900 dark:text-white' : 'text-zinc-600 dark:text-zinc-300' }}">{{ str($j->venue_name)->before(' (') }}</span>
                                                 <span class="mt-0.5 text-[10px] text-zinc-400">{{ $j->submitted_on?->format('M Y') }}</span>
-                                                <span class="mt-1 rounded-full px-1.5 py-px text-[10px] font-medium {{ ['blue' => 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300', 'amber' => 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300', 'red' => 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300', 'green' => 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300', 'zinc' => 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800', 'indigo' => 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300', 'fuchsia' => 'bg-fuchsia-50 text-fuchsia-700 dark:bg-fuchsia-500/10 dark:text-fuchsia-300', 'teal' => 'bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300', 'orange' => 'bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300'][$j->tone()] }}">{{ Submission::DECISIONS[$j->decision] }}@if ($j->daysInReview() !== null) · {{ $j->daysInReview() }}d @endif</span>
+                                                <span class="mt-1 rounded-full px-1.5 py-px text-[10px] font-medium {{ ['blue' => 'bg-sky-50/60 text-sky-700 dark:bg-sky-500/[.06] dark:text-sky-300', 'amber' => 'bg-amber-50/60 text-amber-700 dark:bg-amber-500/[.06] dark:text-amber-300', 'red' => 'bg-rose-50/60 text-rose-600 dark:bg-rose-500/[.06] dark:text-rose-300', 'green' => 'bg-emerald-50/60 text-emerald-700 dark:bg-emerald-500/[.06] dark:text-emerald-300', 'zinc' => 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800', 'indigo' => 'bg-indigo-50/60 text-indigo-700 dark:bg-indigo-500/[.06] dark:text-indigo-300', 'fuchsia' => 'bg-fuchsia-50/60 text-fuchsia-700 dark:bg-fuchsia-500/[.06] dark:text-fuchsia-300', 'teal' => 'bg-teal-50/60 text-teal-700 dark:bg-teal-500/[.06] dark:text-teal-300', 'orange' => 'bg-orange-50/60 text-orange-700 dark:bg-orange-500/[.06] dark:text-orange-300'][$j->tone()] }}">{{ Submission::DECISIONS[$j->decision] }}@if ($j->daysInReview() !== null) · {{ $j->daysInReview() }}d @endif</span>
                                             </div>
                                         @endif
                                             @unless ($loop->last)
@@ -491,16 +491,16 @@ new class extends Component {
                             @if ($chron->isNotEmpty())
                             {{-- Stat tiles --}}
                             <div class="relative mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
-                                <div class="rounded-xl bg-gradient-to-br from-indigo-50 to-white p-3 ring-1 ring-indigo-100 dark:from-indigo-500/10 dark:to-transparent dark:ring-indigo-500/20">
+                                <div class="rounded-xl bg-gradient-to-br from-indigo-50/50 to-white p-3 ring-1 ring-indigo-100/70 dark:from-indigo-500/[.06] dark:to-transparent dark:ring-indigo-500/15">
                                     <p class="text-[11px] text-zinc-500">Journals and conferences tried</p><x-ui.count :value="$chron->count()" class="text-2xl font-semibold" />
                                 </div>
-                                <div class="rounded-xl bg-gradient-to-br from-rose-50 to-white p-3 ring-1 ring-rose-100 dark:from-rose-500/10 dark:to-transparent dark:ring-rose-500/20">
+                                <div class="rounded-xl bg-gradient-to-br from-rose-50/50 to-white p-3 ring-1 ring-rose-100/70 dark:from-rose-500/[.06] dark:to-transparent dark:ring-rose-500/15">
                                     <p class="text-[11px] text-zinc-500">Rejections</p><x-ui.count :value="$rejections" class="text-2xl font-semibold" />
                                 </div>
-                                <div class="rounded-xl bg-gradient-to-br from-sky-50 to-white p-3 ring-1 ring-sky-100 dark:from-sky-500/10 dark:to-transparent dark:ring-sky-500/20">
+                                <div class="rounded-xl bg-gradient-to-br from-sky-50/50 to-white p-3 ring-1 ring-sky-100/70 dark:from-sky-500/[.06] dark:to-transparent dark:ring-sky-500/15">
                                     <p class="text-[11px] text-zinc-500">Days since first sent</p><x-ui.count :value="$first ? (int) $first->diffInDays(now()) : 0" class="text-2xl font-semibold" />
                                 </div>
-                                <div class="rounded-xl bg-gradient-to-br from-amber-50 to-white p-3 ring-1 ring-amber-100 dark:from-amber-500/10 dark:to-transparent dark:ring-amber-500/20">
+                                <div class="rounded-xl bg-gradient-to-br from-amber-50/50 to-white p-3 ring-1 ring-amber-100/70 dark:from-amber-500/[.06] dark:to-transparent dark:ring-amber-500/15">
                                     <p class="text-[11px] text-zinc-500">{{ $cur && $cur->isWaiting() ? ($cur->decision === 'pending' ? 'Days in current review' : 'Days since submission') : 'Status' }}</p>
                                     @if ($cur && $cur->isWaiting())<x-ui.count :value="$cur->daysInReview() ?? 0" class="text-2xl font-semibold" />
                                     @else<p class="mt-1 text-sm font-semibold">{{ $cur ? Submission::DECISIONS[$cur->decision] : Paper::STAGES[$paper->stage] }}</p>@endif
@@ -513,7 +513,7 @@ new class extends Component {
                     <div>
                     <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
                         <div><h2 class="font-semibold">Submission history</h2><p class="text-xs text-zinc-500">One paper, every journal or conference it has been sent to, current one first.</p></div>
-                        <flux:button size="sm" variant="primary" icon="plus" wire:click="newSubmission">{{ $paper->submissions->isEmpty() ? 'Record submission' : 'Add another journal or conference' }}</flux:button>
+                        <flux:button size="sm" :variant="$cur && $cur->isRejection() ? 'outline' : 'primary'" icon="plus" wire:click="newSubmission">{{ $paper->submissions->isEmpty() ? 'Record submission' : 'Add another journal or conference' }}</flux:button>
                     </div>
                     @if ($cur && $cur->isRejection())
                         <div class="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-indigo-300 bg-indigo-50/50 p-4 dark:border-indigo-500/30 dark:bg-indigo-500/5">
@@ -533,13 +533,13 @@ new class extends Component {
                         <div class="relative pb-5 pl-7 sm:pb-6 sm:pl-8" wire:key="s{{ $sub->id }}">
                             @unless ($loop->last)<span class="absolute top-6 bottom-0 left-[11px] w-px bg-zinc-200 dark:bg-zinc-800"></span>@endunless
                             <span class="absolute top-1.5 left-0 flex size-6 items-center justify-center rounded-full ring-4 ring-[#f7f8fc] dark:ring-zinc-950
-                                {{ ['blue' => 'bg-sky-500', 'amber' => 'bg-amber-500', 'red' => 'bg-rose-500', 'green' => 'bg-emerald-500', 'zinc' => 'bg-zinc-400', 'indigo' => 'bg-indigo-500', 'fuchsia' => 'bg-fuchsia-500', 'teal' => 'bg-teal-500', 'orange' => 'bg-orange-500'][$sub->tone()] }} text-white">
+                                {{ ['blue' => 'bg-sky-500', 'amber' => 'bg-amber-500', 'red' => 'bg-rose-500', 'green' => 'bg-emerald-500', 'zinc' => 'bg-zinc-400', 'indigo' => 'bg-indigo-500', 'fuchsia' => 'bg-fuchsia-500', 'teal' => 'bg-teal-500', 'orange' => 'bg-orange-500'][$sub->tone()] }} text-white {{ $isCur ? '' : 'opacity-60' }}">
                                 <flux:icon :name="['blue' => 'clock', 'amber' => 'pencil', 'red' => 'x-mark', 'green' => 'check', 'zinc' => 'minus', 'indigo' => 'paper-airplane', 'fuchsia' => 'user', 'teal' => 'scale', 'orange' => 'arrow-uturn-left'][$sub->tone()]" variant="micro" class="size-3.5" />
                             </span>
                             <div class="panel p-4 {{ $isCur ? 'ring-1 ring-indigo-200 dark:ring-indigo-500/30' : '' }}">
                                 <div class="flex flex-wrap items-start justify-between gap-3">
                                     <div class="min-w-0">
-                                        <div class="flex flex-wrap items-center gap-2"><h3 class="font-semibold">{{ $sub->venue_name }}</h3><x-ui.decision :s="$sub" />@if ($isCur)<span class="rounded-md bg-indigo-600 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-white uppercase">Current</span>@endif</div>
+                                        <div class="flex flex-wrap items-center gap-2"><h3 class="font-semibold">{{ $sub->venue_name }}</h3><x-ui.decision :s="$sub" />@if ($isCur)<span class="rounded-md px-1.5 py-px text-[10px] font-semibold tracking-wide text-indigo-700 uppercase ring-1 ring-indigo-200 ring-inset dark:text-indigo-300 dark:ring-indigo-500/30">Current</span>@endif</div>
                                         <p class="mt-0.5 text-sm text-zinc-500">
                                             {{ $sub->manuscript_id ?: 'No manuscript ID' }} · Submitted {{ $sub->submitted_on?->format('j M Y') ?? 'date not set' }}
                                             @if ($sub->status_on) · {{ Submission::DECISIONS[$sub->decision] }} since {{ $sub->status_on->format('j M Y') }}@endif
@@ -549,7 +549,7 @@ new class extends Component {
                                     </div>
                                     <div class="flex flex-wrap items-center gap-1">
                                         @unless ($isCur)<flux:button size="sm" variant="ghost" icon="star" wire:click="makeCurrent({{ $sub->id }})" title="Make this the paper’s current journal">Set as current</flux:button>@endunless
-                                        @if ($sub->portal_url)<flux:button size="sm" variant="{{ $isCur ? 'primary' : 'filled' }}" icon-trailing="arrow-up-right" :href="$sub->portal_url" target="_blank">Open portal</flux:button>@endif
+                                        @if ($sub->portal_url)<flux:button size="sm" variant="{{ $isCur ? 'filled' : 'outline' }}" icon-trailing="arrow-up-right" :href="$sub->portal_url" target="_blank">Open portal</flux:button>@endif
                                         <x-ui.menu>
                                             <x-slot:trigger><flux:button size="sm">Decision</flux:button></x-slot:trigger>
                                             @foreach (Submission::DECISIONS as $k => $l)<x-ui.menu-item wire:click="setDecision({{ $sub->id }}, '{{ $k }}')">{{ $l }}</x-ui.menu-item>@endforeach
@@ -629,7 +629,7 @@ new class extends Component {
                                 <div class="group -mx-2 flex items-start gap-3 rounded-lg px-2 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-800/50" wire:key="a{{ $au->id }}">
                                     <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-xs font-semibold text-white">{{ str($au->name)->explode(' ')->map(fn ($x) => mb_substr($x, 0, 1))->take(2)->implode('') }}</span>
                                     <div class="min-w-0 flex-1">
-                                        <p class="text-sm font-medium">{{ $au->name }} @if ($au->corresponding)<span class="ml-1 rounded bg-indigo-50 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-600 dark:bg-indigo-500/10">Corresponding</span>@endif</p>
+                                        <p class="text-sm font-medium">{{ $au->name }} @if ($au->corresponding)<span class="ml-1 rounded bg-indigo-50 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">Corresponding</span>@endif</p>
                                         <p class="text-xs text-zinc-500">{{ collect([$au->affiliation, $au->email, $au->orcid ? 'ORCID '.$au->orcid : null])->filter()->implode(' · ') }}</p>
                                         @if ($au->roles)<div class="mt-1.5 flex flex-wrap gap-1">@foreach ($au->roles as $r)<span class="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] dark:bg-zinc-800">{{ $r }}</span>@endforeach</div>@endif
                                     </div>

@@ -23,11 +23,23 @@ Track every manuscript through every journal and conference it is sent to, follo
 
 Manuscript Tracker is also available as a **free, open-source desktop app for macOS, Windows and Linux**: [naimbh/manuscript-tracker-desktop](https://github.com/naimbh/manuscript-tracker-desktop). It needs no server, works fully offline, and uses AI only if you choose to.
 
-Your data moves both ways. In either app, open **Backup & calendar → Download backup (.zip)**, then use **Import** in the other app.
-
 <p align="center">
   <a href="https://github.com/naimbh/manuscript-tracker-desktop/releases/latest"><img src="https://img.shields.io/badge/Download%20the%20desktop%20app-macOS%20·%20Windows%20·%20Linux-4f46e5?style=for-the-badge" alt="Download the Manuscript Tracker desktop app for macOS, Windows and Linux"></a>
 </p>
+
+| System | Download |
+| --- | --- |
+| macOS (Apple silicon and Intel) | [Manuscript.Tracker_1.0.0_universal.dmg](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.0_universal.dmg) |
+| Windows | [Installer (.exe)](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.0_x64-setup.exe) · [MSI package (.msi)](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.0_x64_en-US.msi) |
+| Linux | [AppImage](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.0_amd64.AppImage) · [Debian/Ubuntu (.deb)](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.0_amd64.deb) · [Fedora/RHEL (.rpm)](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker-1.0.0-1.x86_64.rpm) |
+| Everything else | [All downloads](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest) |
+
+The app is not yet signed, so your system may warn you the first time:
+
+- **macOS** may block the first launch. Open **System Settings → Privacy & Security** and click **Open Anyway**.
+- **Windows SmartScreen** may show a warning. Click **More info**, then **Run anyway**.
+
+Your data moves both ways. In either app, open **Backup & calendar → Download backup (.zip)**, then use **Import** in the other app.
 
 ## Why a manuscript tracker instead of a spreadsheet?
 

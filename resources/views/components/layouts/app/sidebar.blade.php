@@ -67,6 +67,8 @@
                     <flux:menu.item :href="route('settings.ai')" icon="sparkles" wire:navigate>AI settings</flux:menu.item>
                     <flux:menu.item :href="route('settings.appearance')" icon="sun" wire:navigate>Appearance</flux:menu.item>
                     <flux:menu.separator />
+                    <flux:menu.item href="https://github.com/naimbh/manuscript-tracker-desktop/releases/latest" target="_blank" rel="noopener" icon="computer-desktop" title="Free for macOS, Windows and Linux. Works offline; import a backup from here.">Get the desktop app</flux:menu.item>
+                    <flux:menu.separator />
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
                         <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">Log out</flux:menu.item>

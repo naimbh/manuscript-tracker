@@ -59,6 +59,14 @@ new #[Title('Backup & calendar')] class extends Component {
                     <flux:button icon="arrow-down-tray" variant="ghost" :href="route('data.export')">Download data only (.json)</flux:button>
                 </div>
                 <flux:text size="sm">The .zip also holds your uploaded files. You can import either file here or in the desktop app.</flux:text>
+                <div class="flex flex-wrap items-center gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
+                    <span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300"><flux:icon.computer-desktop variant="mini" class="size-5" /></span>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-semibold">Get the desktop app</p>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400">Free for macOS, Windows and Linux. Works offline; import a backup from here.</p>
+                    </div>
+                    <flux:button size="sm" icon-trailing="arrow-up-right" href="https://github.com/naimbh/manuscript-tracker-desktop/releases/latest" target="_blank" rel="noopener">Download</flux:button>
+                </div>
             </div>
             <form wire:submit="import" class="space-y-3">
                 <flux:heading>Import</flux:heading>
