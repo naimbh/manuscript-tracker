@@ -90,7 +90,7 @@ See [Installation and setup](docs/INSTALLATION.md#ai-features) for providers, ke
 
 ## Your data
 
-Everything lives in your own database and `storage/app`. Export a JSON backup or import one under **Settings → Backup & calendar**. Uploaded files are private and served only to their owner.
+Everything lives in your own database and `storage/app`. Under **Settings → Backup & calendar**, download a backup (a .zip with your files, or data only as .json) or import one; the same backups work in the desktop app. Uploaded files are private and served only to their owner.
 
 ## Support the project
 
