@@ -9,7 +9,7 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Volt\Component;
 
-new #[Title('Opportunities')] class extends Component {
+new #[Title('Calls for Papers')] class extends Component {
     #[Url(except: 'open')]
     public string $show = 'open';
 
@@ -39,7 +39,7 @@ new #[Title('Opportunities')] class extends Component {
             escapeshellarg(base_path()), escapeshellarg(config('services.ai.php_bin')), $user->id, $scan->id);
         exec($cmd);
         $this->dispatch('ai-runs-changed');
-        Flux::toast(text: 'Scanning. You can keep working; you will be notified when it finishes.');
+        Flux::toast(text: 'Looking for calls for papers. You can keep working; you will be notified when it finishes.');
     }
 
     public function setStatus(int $id, string $status): void
@@ -88,7 +88,7 @@ new #[Title('Opportunities')] class extends Component {
         <div class="hero-grid pointer-events-none absolute inset-0 text-zinc-900 dark:text-white"></div>
         <div class="relative flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
             <div class="max-w-xl">
-                <p class="eyebrow">Opportunities</p>
+                <p class="eyebrow">Calls for Papers</p>
                 <h1 class="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">Calls that fit your work</h1>
                 <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Every day, the AI reads new calls from WikiCFP and the publishers’ call pages, keeps only those with proceedings or a journal behind them, and ranks them against your interests.</p>
                 <button class="mt-3 inline-flex max-w-full items-center gap-1.5 truncate rounded-full bg-white/70 px-3 py-1 text-xs text-zinc-600 ring-1 ring-zinc-200 hover:ring-indigo-300 dark:bg-zinc-900/60 dark:text-zinc-300 dark:ring-zinc-700" x-on:click="$flux.modal('interests').show()">
@@ -97,7 +97,7 @@ new #[Title('Opportunities')] class extends Component {
             </div>
             <div class="flex flex-col items-start gap-2 sm:items-end">
                 <flux:button variant="primary" icon="{{ $running ? 'arrow-path' : 'magnifying-glass-circle' }}" wire:click="scanNow" :disabled="$running || ! $aiReady" class="{{ $running ? '[&_svg]:animate-spin' : '' }}">
-                    {{ $running ? 'Scanning…' : 'Scan now' }}
+                    {{ $running ? 'Searching…' : 'Find calls for papers' }}
                 </flux:button>
                 <span class="text-[11px] text-zinc-500">
                     @if (! $aiReady) {{ $aiStatus }}
@@ -214,8 +214,8 @@ new #[Title('Opportunities')] class extends Component {
         </section>
     @empty
         <div class="panel">
-            <x-ui.empty title="{{ $show === 'open' ? 'No open calls yet' : 'Nothing here' }}" text="{{ $show === 'open' ? 'Run a scan now, or wait for the daily scan at '.config('tracker.scan_time').'.' : '' }}">
-                @if ($show === 'open' && $aiReady)<flux:button variant="primary" wire:click="scanNow">Scan now</flux:button>@endif
+            <x-ui.empty title="{{ $show === 'open' ? 'No open calls yet' : 'Nothing here' }}" text="{{ $show === 'open' ? 'Press “Find calls for papers”, or wait for the daily search at '.config('tracker.scan_time').'.' : '' }}">
+                @if ($show === 'open' && $aiReady)<flux:button variant="primary" wire:click="scanNow">Find calls for papers</flux:button>@endif
             </x-ui.empty>
         </div>
     @endforelse

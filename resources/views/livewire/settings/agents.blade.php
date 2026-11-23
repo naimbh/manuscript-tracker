@@ -43,7 +43,7 @@ new #[Title('Agents')] class extends Component {
         <div class="space-y-8" x-data="{ copied: null, copy(t, k) { navigator.clipboard.writeText(t); this.copied = k; setTimeout(() => this.copied = null, 1500) } }">
             <div class="rounded-xl border border-zinc-200 p-4 text-sm dark:border-zinc-700">
                 <p class="font-medium">What agents can do</p>
-                <p class="mt-1 text-zinc-500">List and read papers, record a submission, record an editor’s decision, list and add deadlines, search the venue library, list calls for papers and list published work with citations.</p>
+                <p class="mt-1 text-zinc-500">List and read papers, record a submission, record an editor’s decision, list and add deadlines, search your journals and conferences, list calls for papers and list published work with citations.</p>
             </div>
 
             <div class="space-y-3">

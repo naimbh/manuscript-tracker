@@ -39,7 +39,7 @@ new #[Title('Research profile')] class extends Component {
 
 <section class="page-in w-full">
     @include('partials.settings-heading')
-    <x-settings.layout heading="Research profile" subheading="Used by the Published page and the daily opportunity scan.">
+    <x-settings.layout heading="Research profile" subheading="Used by the Published page and the daily calls for papers scan.">
         <form wire:submit="save" class="space-y-6">
             <flux:field>
                 <flux:label>Google Scholar profile</flux:label>
@@ -49,7 +49,7 @@ new #[Title('Research profile')] class extends Component {
             </flux:field>
             <flux:field>
                 <flux:label>Research interests</flux:label>
-                <flux:description>Topics separated by commas. The opportunity scan uses them to find calls for papers. Leave empty to use your papers’ keywords: {{ $suggested }}.</flux:description>
+                <flux:description>Topics separated by commas. The calls for papers scan uses them to find calls that fit. Leave empty to use your papers’ keywords: {{ $suggested }}.</flux:description>
                 <flux:textarea wire:model="interests" rows="3" placeholder="platform labor, CSCW, ICT4D" />
             </flux:field>
             <flux:button type="submit" variant="primary">Save</flux:button>

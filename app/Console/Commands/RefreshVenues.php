@@ -9,9 +9,9 @@ use Illuminate\Console\Command;
 
 class RefreshVenues extends Command
 {
-    protected $signature = 'venues:refresh {--all : Refresh every conference, not only watched ones} {--stale=7 : Skip venues checked within this many days}';
+    protected $signature = 'venues:refresh {--all : Refresh every conference, not only watched ones} {--stale=7 : Skip journals and conferences checked within this many days}';
 
-    protected $description = 'Update watched venues’ next edition and deadlines with Claude and web search';
+    protected $description = 'Update the next edition and deadlines of watched journals and conferences with Claude and web search';
 
     public function handle(VenueResearcher $researcher): int
     {
@@ -28,7 +28,7 @@ class RefreshVenues extends Command
         $tally = [];
         $runs = [];
         foreach ($venues->groupBy('user_id') as $uid => $group) {
-            $runs[$uid] = \App\Models\AiRun::begin(\App\Models\User::find($uid), 'venues', 'Weekly venue update', $group->count(), route('venues'));
+            $runs[$uid] = \App\Models\AiRun::begin(\App\Models\User::find($uid), 'venues', 'Weekly journal and conference update', $group->count(), route('venues'));
         }
         foreach ($venues as $venue) {
             $tally[$venue->user_id] ??= ['ok' => 0, 'failed' => 0];
@@ -49,8 +49,8 @@ class RefreshVenues extends Command
             $r->finish();
         }
         foreach ($tally as $userId => $t) {
-            \App\Models\User::find($userId)?->notify(new AiJobFinished('Venue update finished',
-                "{$t['ok']} venues updated".($t['failed'] ? ", {$t['failed']} failed." : '.'), $t['failed'] ? 'warning' : 'success', route('venues')));
+            \App\Models\User::find($userId)?->notify(new AiJobFinished('Journal and conference update finished',
+                "{$t['ok']} journals and conferences updated".($t['failed'] ? ", {$t['failed']} failed." : '.'), $t['failed'] ? 'warning' : 'success', route('venues')));
         }
 
         return self::SUCCESS;

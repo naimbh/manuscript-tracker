@@ -413,7 +413,7 @@ new class extends Component {
     <div class="flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 lg:px-8" wire:key="tab-{{ $tab }}">
         @if ($risk)
             <flux:callout variant="danger" icon="eye" class="mb-5" heading="Anonymity risk">
-                <flux:callout.text>This paper has a public preprint ({{ $paper->preprint_server ?: 'link' }}) while it is under double-anonymous review at {{ $risk->venue_name }}. Check the venue’s preprint policy, and do not cite the preprint in the anonymized file.</flux:callout.text>
+                <flux:callout.text>This paper has a public preprint ({{ $paper->preprint_server ?: 'link' }}) while it is under double-anonymous review at {{ $risk->venue_name }}. Check its preprint policy, and do not cite the preprint in the anonymized file.</flux:callout.text>
             </flux:callout>
         @endif
 
@@ -492,7 +492,7 @@ new class extends Component {
                             {{-- Stat tiles --}}
                             <div class="relative mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
                                 <div class="rounded-xl bg-gradient-to-br from-indigo-50 to-white p-3 ring-1 ring-indigo-100 dark:from-indigo-500/10 dark:to-transparent dark:ring-indigo-500/20">
-                                    <p class="text-[11px] text-zinc-500">Venues tried</p><x-ui.count :value="$chron->count()" class="text-2xl font-semibold" />
+                                    <p class="text-[11px] text-zinc-500">Journals and conferences tried</p><x-ui.count :value="$chron->count()" class="text-2xl font-semibold" />
                                 </div>
                                 <div class="rounded-xl bg-gradient-to-br from-rose-50 to-white p-3 ring-1 ring-rose-100 dark:from-rose-500/10 dark:to-transparent dark:ring-rose-500/20">
                                     <p class="text-[11px] text-zinc-500">Rejections</p><x-ui.count :value="$rejections" class="text-2xl font-semibold" />
@@ -512,8 +512,8 @@ new class extends Component {
 
                     <div>
                     <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
-                        <div><h2 class="font-semibold">Submission history</h2><p class="text-xs text-zinc-500">One paper, every venue it has been sent to, current journal first.</p></div>
-                        <flux:button size="sm" variant="primary" icon="plus" wire:click="newSubmission">{{ $paper->submissions->isEmpty() ? 'Record submission' : 'Add another venue' }}</flux:button>
+                        <div><h2 class="font-semibold">Submission history</h2><p class="text-xs text-zinc-500">One paper, every journal or conference it has been sent to, current one first.</p></div>
+                        <flux:button size="sm" variant="primary" icon="plus" wire:click="newSubmission">{{ $paper->submissions->isEmpty() ? 'Record submission' : 'Add another journal or conference' }}</flux:button>
                     </div>
                     @if ($cur && $cur->isRejection())
                         <div class="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-indigo-300 bg-indigo-50/50 p-4 dark:border-indigo-500/30 dark:bg-indigo-500/5">
@@ -563,7 +563,7 @@ new class extends Component {
                                         <x-ui.ring :pct="$c['pct'] ?? 0" :size="54" :tone="$c ? ($c['overdue'] ? 'red' : ($c['pct'] > 75 ? 'amber' : 'indigo')) : 'zinc'" :label="$sub->daysInReview()" sub="days" />
                                         <div class="min-w-0 flex-1 text-sm">
                                             <p class="font-medium">{{ $sub->daysInReview() }} days in review</p>
-                                            <p class="text-xs {{ $c && $c['overdue'] ? 'text-rose-500' : 'text-zinc-500' }}">@if ($c){{ $c['overdue'] ? ($c['days'] - $c['typical']).' days past the usual '.$c['typical'].'. A status query is fair.' : 'Usually '.$c['typical'].' days, so a decision around '.$c['expected_on']->format('j M').'.' }}@else Add the venue’s usual decision time to start the clock.@endif</p>
+                                            <p class="text-xs {{ $c && $c['overdue'] ? 'text-rose-500' : 'text-zinc-500' }}">@if ($c){{ $c['overdue'] ? ($c['days'] - $c['typical']).' days past the usual '.$c['typical'].'. A status query is fair.' : 'Usually '.$c['typical'].' days, so a decision around '.$c['expected_on']->format('j M').'.' }}@else Add the usual decision time to start the clock.@endif</p>
                                         </div>
                                     </div>
                                 @elseif ($c)
@@ -613,7 +613,7 @@ new class extends Component {
                         <x-ui.preprint-entry :paper="$paper" />
                     @endif
                     @if ($paper->submissions->isEmpty())
-                        <div class="panel"><x-ui.empty title="Not submitted to a journal yet" text="Record a submission when you send this paper to a venue. The review clock starts from that date.">
+                        <div class="panel"><x-ui.empty title="Not submitted to a journal yet" text="Record a submission when you send this paper to a journal or conference. The review clock starts from that date.">
                             <flux:button variant="primary" wire:click="newSubmission">Record submission</flux:button></x-ui.empty></div>
                     @endif
                     </div>
@@ -702,8 +702,8 @@ new class extends Component {
                         </button>
                     @endif
                     <div class="panel p-4">
-                        <h3 class="font-semibold">Next-venue queue</h3>
-                        <p class="mt-0.5 text-xs text-zinc-500">If this round ends in rejection, the first venue becomes the next submission in one click.</p>
+                        <h3 class="font-semibold">Next-submission queue</h3>
+                        <p class="mt-0.5 text-xs text-zinc-500">If this round ends in rejection, the first journal or conference here becomes the next submission in one click.</p>
                         @if (($paper->needsNextVenue() || $paper->stage === 'ready') && $paper->queue->isNotEmpty())
                             <flux:button class="mt-3 w-full" variant="primary" icon-trailing="arrow-right" wire:click="submitNext">Submit to {{ str($paper->queue->first()->venue->name)->limit(28) }}</flux:button>
                         @endif
@@ -721,7 +721,7 @@ new class extends Component {
                             @endforeach
                         </div>
                         <div class="mt-3 flex gap-2">
-                            <flux:select wire:model="queueVenue" size="sm" placeholder="Add a venue…">
+                            <flux:select wire:model="queueVenue" size="sm" placeholder="Add a journal or conference…">
                                 @foreach ($venues as $v)<flux:select.option value="{{ $v->id }}">{{ $v->name }}</flux:select.option>@endforeach
                             </flux:select>
                             <flux:button size="sm" icon="plus" wire:click="addToQueue" />
@@ -800,11 +800,11 @@ new class extends Component {
         <form wire:submit="saveSubmission" class="space-y-4">
             <flux:heading size="lg">{{ $subId ? 'Edit submission' : 'Record submission' }}</flux:heading>
             <div class="grid gap-4 sm:grid-cols-2">
-                <flux:select wire:model.live="s.venue_id" label="Venue from your library">
+                <flux:select wire:model.live="s.venue_id" label="From your journals and conferences">
                     <flux:select.option value="">Type a new one below</flux:select.option>
                     @foreach ($venues as $v)<flux:select.option value="{{ $v->id }}">{{ $v->name }}</flux:select.option>@endforeach
                 </flux:select>
-                <flux:input wire:model="s.venue_name" label="Venue name" />
+                <flux:input wire:model="s.venue_name" label="Journal or conference name" />
                 <flux:input wire:model="s.manuscript_id" label="Manuscript ID" placeholder="RNTW-2026-0123" />
                 <flux:input wire:model="s.portal_url" label="Portal link" placeholder="https://" />
                 <flux:input wire:model="s.submitted_on" type="date" label="Submitted on" />

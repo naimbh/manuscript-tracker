@@ -10,7 +10,7 @@ use Laravel\Mcp\Server\Attributes\Version;
 
 #[Name('Manuscript Tracker')]
 #[Version('1.0.0')]
-#[Instructions('Tools for a researcher’s manuscript tracker: papers and their submissions, editor decisions, deadlines, the venue library, calls for papers and published work. Use list-papers or get-paper before changing anything, and confirm writes with the user.')]
+#[Instructions('Tools for a researcher’s manuscript tracker: papers and their submissions, editor decisions, deadlines, the user’s journals and conferences, calls for papers and published work. Use list-papers or get-paper before changing anything, and confirm writes with the user.')]
 class TrackerServer extends Server
 {
     protected array $tools = [

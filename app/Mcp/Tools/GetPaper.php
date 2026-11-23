@@ -12,7 +12,7 @@ use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 use Laravel\Mcp\Server\Tools\Annotations\IsIdempotent;
 
 #[IsReadOnly]
-#[Description('Get one paper with its abstract, authors, every submission (venue, IDs, dates, decision, notes, reviewer checklist) and the next-venue queue.')]
+#[Description('Get one paper with its abstract, authors, every submission (journal or conference, IDs, dates, decision, notes, reviewer checklist) and the next-submission queue.')]
 class GetPaper extends Tool
 {
     use ResolvesUser;

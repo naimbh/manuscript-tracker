@@ -31,9 +31,9 @@
                 <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate.hover>Desk</flux:navlist.item>
                 <flux:navlist.item icon="document-text" :href="route('papers.index')" :current="request()->routeIs('papers.*')" wire:navigate.hover>Papers</flux:navlist.item>
                 <flux:navlist.item icon="trophy" :href="route('publications')" :current="request()->routeIs('publications')" wire:navigate.hover>Published</flux:navlist.item>
-                <flux:navlist.item icon="building-library" :href="route('venues')" :current="request()->routeIs('venues')" wire:navigate.hover>Venues</flux:navlist.item>
+                <flux:navlist.item icon="building-library" :href="route('venues')" :current="request()->routeIs('venues')" wire:navigate.hover>Journals &amp; Conferences</flux:navlist.item>
                 @php $newOpps = auth()->user()->opportunities()->where('status', 'new')->where('created_at', '>=', now()->startOfWeek())->count(); @endphp
-                <flux:navlist.item icon="sparkles" :href="route('opportunities')" :current="request()->routeIs('opportunities')" :badge="$newOpps ?: null" wire:navigate.hover>Opportunities</flux:navlist.item>
+                <flux:navlist.item icon="sparkles" :href="route('opportunities')" :current="request()->routeIs('opportunities')" :badge="$newOpps ?: null" wire:navigate.hover>Calls for Papers</flux:navlist.item>
                 <flux:navlist.item icon="calendar-days" :href="route('deadlines')" :current="request()->routeIs('deadlines')" wire:navigate.hover>Deadlines</flux:navlist.item>
             </flux:navlist>
 

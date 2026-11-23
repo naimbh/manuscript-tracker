@@ -38,11 +38,11 @@ new #[Title('Desk')] class extends Component {
             if ($p->stage === 'ready') {
                 $next = $p->queue->first();
                 $attention->prepend(['tone' => 'violet', 'icon' => 'paper-airplane', 'paper' => $p,
-                    'text' => $next ? "Ready to submit. Next venue: {$next->venue->name}." : 'Ready to submit. Add a venue to its next-venue queue.',
+                    'text' => $next ? "Ready to submit. Next up: {$next->venue->name}." : 'Ready to submit. Add a journal or conference to its next-submission queue.',
                     'next' => (bool) $next]);
             } elseif ($p->needsNextVenue()) {
                 $attention->push(['tone' => 'indigo', 'icon' => 'arrow-right', 'paper' => $p,
-                    'text' => $p->queue->first() ? "Ready for its next venue: {$p->queue->first()->venue->name}." : 'Rejected last time, and the next-venue queue is empty.',
+                    'text' => $p->queue->first() ? "Ready for its next submission: {$p->queue->first()->venue->name}." : 'Rejected last time, and the next-submission queue is empty.',
                     'next' => (bool) $p->queue->first()]);
             }
         }
@@ -180,7 +180,7 @@ new #[Title('Desk')] class extends Component {
             <section>
                 <div class="mb-3 flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
                     <h2 class="font-semibold">Review clocks</h2>
-                    <span class="text-xs text-zinc-400">Days in review against each venue’s usual decision time</span>
+                    <span class="text-xs text-zinc-400">Days in review against each journal’s or conference’s usual decision time</span>
                 </div>
                 <div class="stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($clocks as $s)
@@ -196,7 +196,7 @@ new #[Title('Desk')] class extends Component {
                                 <div class="truncate text-sm text-zinc-500">{{ $s->venue_name }}</div>
                                 <div class="mt-1 text-xs {{ $c && $c['overdue'] ? 'text-rose-500' : 'text-zinc-400' }}">
                                     @if ($c) {{ $c['overdue'] ? 'Past the usual '.$c['typical'].' days' : 'Decision expected around '.$c['expected_on']->format('j M') }}
-                                    @else Add the venue’s decision time to start the clock
+                                    @else Add the usual decision time to start the clock
                                     @endif
                                 </div>
                             </div>

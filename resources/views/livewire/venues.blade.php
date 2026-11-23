@@ -8,7 +8,7 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Volt\Component;
 
-new #[Title('Venues')] class extends Component {
+new #[Title('Journals & Conferences')] class extends Component {
     #[Url(except: 'conference')]
     public string $tab = 'conference';
 
@@ -94,14 +94,15 @@ new #[Title('Venues')] class extends Component {
 
         $this->tab = $data['kind'] === 'journal' ? 'journal' : 'conference';
         Flux::modal('venue-form')->close();
-        Flux::toast(variant: 'success', text: $this->editingId ? 'Venue updated.' : 'Venue added.');
+        Flux::toast(variant: 'success', text: (Venue::KINDS[$data['kind']] ?? 'Journal').($this->editingId ? ' updated.' : ' added.'));
     }
 
     public function delete(): void
     {
-        auth()->user()->venues()->findOrFail($this->editingId)->delete();
+        $v = auth()->user()->venues()->findOrFail($this->editingId);
+        $v->delete();
         Flux::modal('venue-form')->close();
-        Flux::toast(text: 'Venue removed.');
+        Flux::toast(text: (Venue::KINDS[$v->kind] ?? 'Journal').' removed.');
     }
 
     public function toggleWatch(int $id): void
@@ -143,15 +144,15 @@ new #[Title('Venues')] class extends Component {
             auth()->user()->aiRuns()->find($this->runId)?->finish();
             $this->runId = null;
         }
-        auth()->user()->notify(new \App\Notifications\AiJobFinished('Venue update finished',
-            "{$done} venues checked".($failed ? ", {$failed} failed." : '.'), $failed ? 'warning' : 'success', route('venues')));
+        auth()->user()->notify(new \App\Notifications\AiJobFinished(($this->tab === 'journal' ? 'Journal' : 'Conference').' update finished',
+            "{$done} ".($this->tab === 'journal' ? 'journals' : 'conferences').' checked'.($failed ? ", {$failed} failed." : '.'), $failed ? 'warning' : 'success', route('venues')));
         $this->dispatch('notifications-changed');
     }
 
     public function restoreCatalog(): void
     {
         $n = VenueCatalog::seedFor(auth()->user());
-        Flux::toast(variant: 'success', text: $n ? "Added {$n} venues from the starter list." : 'You already have every venue in the starter list.');
+        Flux::toast(variant: 'success', text: $n ? "Added {$n} journals and conferences from the starter list." : 'You already have every journal and conference in the starter list.');
     }
 
     public function with(): array
@@ -209,7 +210,7 @@ new #[Title('Venues')] class extends Component {
             this.errors = []; this.done = 0; this.total = ids.length; this.run = true; await $wire.startBatch(ids.length);
             for (const id of ids) { if (! this.run) break; await this.one(id); this.done++; }
             this.run = null; $wire.notifyBatch(this.done, this.errors.length); $wire.$refresh();
-            $flux.toast({ variant: this.errors.length ? 'warning' : 'success', text: 'Checked ' + this.done + ' venues' + (this.errors.length ? ', ' + this.errors.length + ' failed.' : '.') });
+            $flux.toast({ variant: this.errors.length ? 'warning' : 'success', text: 'Checked ' + this.done + ($wire.tab === 'journal' ? ' journals' : ' conferences') + (this.errors.length ? ', ' + this.errors.length + ' failed.' : '.') });
         }
      }">
 
@@ -218,7 +219,7 @@ new #[Title('Venues')] class extends Component {
         <div class="hero-grid pointer-events-none absolute inset-0 text-zinc-900 dark:text-white"></div>
         <div class="relative flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
             <div>
-                <p class="eyebrow">Venue library</p>
+                <p class="eyebrow">Journals &amp; Conferences</p>
                 <h1 class="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">Where your papers can go</h1>
                 <p class="mt-1 max-w-xl text-sm text-zinc-600 dark:text-zinc-400">Conferences that publish proceedings, and journals with their quartile, speed and acceptance rate. Keep them current with one click.</p>
             </div>
@@ -228,7 +229,7 @@ new #[Title('Venues')] class extends Component {
                         <flux:icon.sparkles variant="micro" /> {{ $aiReady ? 'AI updates on' : 'AI updates off' }}
                     </span>
                 </flux:tooltip>
-                <flux:button icon="plus" wire:click="add">Add venue</flux:button>
+                <flux:button icon="plus" wire:click="add">Add journal or conference</flux:button>
                 <template x-if="! run">
                     <flux:button variant="primary" icon="sparkles" x-on:click="all({{ $ids->toJson() }})" :disabled="! $aiReady">Update {{ $tab === 'journal' ? 'journals' : 'conferences' }}</flux:button>
                 </template>
@@ -280,7 +281,7 @@ new #[Title('Venues')] class extends Component {
                 </button>
             @endforeach
         </div>
-        <div class="w-full sm:w-64"><flux:input wire:model.live.debounce.150ms="q" data-search icon="magnifying-glass" size="sm" placeholder="Search venues" clearable /></div>
+        <div class="w-full sm:w-64"><flux:input wire:model.live.debounce.150ms="q" data-search icon="magnifying-glass" size="sm" placeholder="Search {{ $tab === 'journal' ? 'journals' : 'conferences' }}" clearable /></div>
         <div class="-mx-4 flex w-[calc(100%+2rem)] gap-1.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:w-auto sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&>button]:shrink-0">
             <button wire:click="$set('field', '')" class="rounded-full px-2.5 py-1 text-xs font-medium transition {{ $field === '' ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300' }}">All fields</button>
             @foreach ($fields as $f)
@@ -291,8 +292,8 @@ new #[Title('Venues')] class extends Component {
 
     @if ($list->isEmpty())
         <div class="panel">
-            <x-ui.empty art="venue" title="No venues here" text="Add one yourself, or bring back the starter list of IS, iSchool and HCI venues.">
-                <div class="flex gap-2"><flux:button icon="plus" wire:click="add">Add venue</flux:button><flux:button variant="ghost" wire:click="restoreCatalog">Restore starter list</flux:button></div>
+            <x-ui.empty art="venue" title="{{ $tab === 'journal' ? 'No journals here' : 'No conferences here' }}" text="Add one yourself, or bring back the starter list of IS, iSchool and HCI journals and conferences.">
+                <div class="flex gap-2"><flux:button icon="plus" wire:click="add">Add journal or conference</flux:button><flux:button variant="ghost" wire:click="restoreCatalog">Restore starter list</flux:button></div>
             </x-ui.empty>
         </div>
     @elseif ($tab === 'conference')
@@ -448,8 +449,9 @@ new #[Title('Venues')] class extends Component {
     {{-- Add / edit --}}
     <flux:modal name="venue-form" class="w-full max-w-2xl">
         @if ($formOpen)
+        @php $noun = strtolower(Venue::KINDS[$form['kind'] ?? ''] ?? 'journal or conference'); @endphp
         <form wire:submit="save" class="space-y-5">
-            <flux:heading size="lg">{{ $editingId ? 'Edit venue' : 'Add venue' }}</flux:heading>
+            <flux:heading size="lg">{{ $editingId ? 'Edit '.$noun : 'Add journal or conference' }}</flux:heading>
             <div class="grid gap-4 sm:grid-cols-3">
                 <div class="sm:col-span-2"><flux:input wire:model="form.name" label="Name" placeholder="CHI 2027" /></div>
                 <flux:select wire:model.live="form.kind" label="Type">
@@ -495,10 +497,10 @@ new #[Title('Venues')] class extends Component {
                 <flux:input wire:model="form.portal_url" label="Submission portal" placeholder="https://" />
             </div>
             <flux:textarea wire:model="form.notes" label="Notes" rows="2" />
-            <flux:checkbox wire:model="form.watch" label="Watch: refresh this venue with AI every week" />
+            <flux:checkbox wire:model="form.watch" label="Watch: update this {{ $noun }} with AI every week" />
 
             <div class="flex items-center justify-between">
-                <div>@if ($editingId)<flux:button variant="ghost" class="!text-rose-600" wire:click="delete" wire:confirm="Remove this venue? Your submissions to it stay.">Remove</flux:button>@endif</div>
+                <div>@if ($editingId)<flux:button variant="ghost" class="!text-rose-600" wire:click="delete" wire:confirm="Remove this {{ $noun }}? Your submissions to it stay.">Remove</flux:button>@endif</div>
                 <div class="flex gap-2">
                     <flux:modal.close><flux:button variant="ghost">Cancel</flux:button></flux:modal.close>
                     <flux:button type="submit" variant="primary">Save</flux:button>

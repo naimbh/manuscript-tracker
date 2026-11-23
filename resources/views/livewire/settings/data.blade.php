@@ -53,7 +53,7 @@ new #[Title('Backup & calendar')] class extends Component {
             <flux:separator />
             <div class="space-y-3">
                 <flux:heading>Backup</flux:heading>
-                <flux:text>Everything in your account: papers, submissions, venues, authors, checklists, deadlines, publications, calls for papers, your profile and site settings. API keys and passwords are never included.</flux:text>
+                <flux:text>Everything in your account: papers, submissions, journals and conferences, authors, checklists, deadlines, publications, calls for papers, your profile and site settings. API keys and passwords are never included.</flux:text>
                 <div class="flex flex-wrap gap-2">
                     <flux:button icon="arrow-down-tray" :href="route('data.export.zip')">Download backup (.zip with files)</flux:button>
                     <flux:button icon="arrow-down-tray" variant="ghost" :href="route('data.export')">Download data only (.json)</flux:button>

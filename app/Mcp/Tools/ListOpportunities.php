@@ -12,7 +12,7 @@ use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 use Laravel\Mcp\Server\Tools\Annotations\IsIdempotent;
 
 #[IsReadOnly]
-#[Description('List calls for papers found by the opportunity scans, best fit first.')]
+#[Description('List calls for papers found by the daily calls for papers scan, best fit first.')]
 class ListOpportunities extends Tool
 {
     use ResolvesUser;

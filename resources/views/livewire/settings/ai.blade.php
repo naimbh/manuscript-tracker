@@ -101,7 +101,7 @@ new #[Title('AI')] class extends Component {
 
 <section class="page-in w-full">
     @include('partials.settings-heading')
-    <x-settings.layout heading="AI" subheading="Choose the AI that runs scans, venue updates and citation updates. Keys are stored encrypted.">
+    <x-settings.layout heading="AI" subheading="Choose the AI that runs the calls for papers scan, journal and conference updates, and citation updates. Keys are stored encrypted.">
         <form wire:submit="save" class="space-y-7">
             <div class="flex items-center gap-3 rounded-xl border p-3 text-sm {{ $ready ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300' : 'border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300' }}">
                 <flux:icon :name="$ready ? 'check-circle' : 'exclamation-triangle'" variant="mini" />

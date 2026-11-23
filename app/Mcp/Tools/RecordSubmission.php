@@ -11,7 +11,7 @@ use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 use Laravel\Mcp\Server\Tools\Annotations\IsIdempotent;
 
-#[Description('Record that a paper was sent to a journal or conference. Creates the venue in the library if it is new, and makes this the current submission.')]
+#[Description('Record that a paper was sent to a journal or conference. Adds it to the user’s journals and conferences if it is new, and makes this the current submission.')]
 class RecordSubmission extends Tool
 {
     use ResolvesUser;
@@ -25,7 +25,7 @@ class RecordSubmission extends Tool
         }
         $name = trim((string) $request->get('venue'));
         if ($name === '') {
-            return Response::error('Give the venue name.');
+            return Response::error('Give the journal or conference name.');
         }
         $venue = $user->venues()->where('name', $name)->first() ?? $user->venues()->create(['name' => $name, 'kind' => $request->get('kind', 'journal')]);
         $p->submissions()->update(['is_current' => false]);
@@ -45,7 +45,7 @@ class RecordSubmission extends Tool
         return [
             'paper_id' => $schema->integer()->required(),
             'venue' => $schema->string()->description('Journal or conference name.')->required(),
-            'kind' => $schema->string()->enum(['journal', 'conference'])->description('Only used when the venue is new.'),
+            'kind' => $schema->string()->enum(['journal', 'conference'])->description('Only used when the journal or conference is new.'),
             'manuscript_id' => $schema->string(),
             'submitted_on' => $schema->string()->description('YYYY-MM-DD. Defaults to today.'),
             'portal_url' => $schema->string(),

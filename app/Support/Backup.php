@@ -233,7 +233,7 @@ class Backup
     /** A short sentence such as “Imported 2 papers, 3 files and 1 new venue.” */
     public static function summary(array $n): string
     {
-        $labels = ['papers' => ['paper', 'papers'], 'files' => ['file', 'files'], 'venues' => ['new venue', 'new venues'],
+        $labels = ['papers' => ['paper', 'papers'], 'files' => ['file', 'files'], 'venues' => ['new journal or conference', 'new journals and conferences'],
             'publications' => ['publication', 'publications'], 'opportunities' => ['new call', 'new calls'], 'deadlines' => ['deadline', 'deadlines'],
             'profile' => ['profile field', 'profile fields'], 'settings' => ['setting', 'settings']];
         $parts = collect($labels)->filter(fn ($l, $k) => ($n[$k] ?? 0) > 0)

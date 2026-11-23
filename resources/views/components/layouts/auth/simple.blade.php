@@ -20,11 +20,11 @@
                 </a>
 
                 <div class="relative">
-                    <h2 class="max-w-md text-4xl leading-tight font-semibold tracking-tight text-balance">Every paper, every venue, every decision, in one place.</h2>
+                    <h2 class="max-w-md text-4xl leading-tight font-semibold tracking-tight text-balance">Every paper, every journal and conference, every decision, in one place.</h2>
                     <ul class="mt-8 space-y-4 text-sm text-white/85">
                         @foreach ([
                             ['clock', 'Review clocks that tell you when a decision is overdue'],
-                            ['building-library', 'A venue library kept current with AI and real sources'],
+                            ['building-library', 'Journals and conferences kept current with AI and real sources'],
                             ['sparkles', 'Daily calls for papers that fit your research'],
                             ['chart-bar', 'Your citations and h-index from Google Scholar'],
                         ] as [$icon, $text])
@@ -38,7 +38,7 @@
 
                 {{-- Mini journey graphic --}}
                 <div class="relative rounded-2xl bg-white/10 p-4 ring-1 ring-white/20 backdrop-blur">
-                    <div class="flex items-center justify-between text-[11px] text-white/70"><span>Journey</span><span>3 venues</span></div>
+                    <div class="flex items-center justify-between text-[11px] text-white/70"><span>Journey</span><span>3 submissions</span></div>
                     <div class="mt-3 flex items-center">
                         @foreach ([['x-mark', 'bg-rose-400', 'Conference'], ['x-mark', 'bg-rose-400', 'Journal A'], ['clock', 'bg-sky-400', 'Journal B']] as $i => [$ic, $bg, $label])
                             @if ($i > 0)<span class="mx-2 h-px flex-1 bg-white/30"></span>@endif

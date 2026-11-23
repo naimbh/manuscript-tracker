@@ -12,7 +12,7 @@ use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 use Laravel\Mcp\Server\Tools\Annotations\IsIdempotent;
 
 #[IsReadOnly]
-#[Description('List published work with venue, year and Google Scholar citation counts, plus the citation summary.')]
+#[Description('List published work with journal or conference, year and Google Scholar citation counts, plus the citation summary.')]
 class ListPublications extends Tool
 {
     use ResolvesUser;

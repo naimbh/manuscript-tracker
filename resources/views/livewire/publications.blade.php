@@ -299,7 +299,7 @@ new #[Title('Published')] class extends Component {
             <div class="grid gap-4 sm:grid-cols-3">
                 <div class="sm:col-span-2"><flux:input wire:model="f.authors" label="Authors" /></div>
                 <flux:select wire:model="f.kind" label="Type">@foreach (Publication::KINDS as $k => $l)<flux:select.option value="{{ $k }}">{{ $l }}</flux:select.option>@endforeach</flux:select>
-                <div class="sm:col-span-2"><flux:input wire:model="f.venue" label="Journal / venue" /></div>
+                <div class="sm:col-span-2"><flux:input wire:model="f.venue" label="Journal or conference" /></div>
                 <flux:input wire:model="f.year" type="number" label="Year" />
                 <flux:input wire:model="f.volume" label="Volume" />
                 <flux:input wire:model="f.issue" label="Issue" />

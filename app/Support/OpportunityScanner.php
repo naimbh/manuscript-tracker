@@ -63,7 +63,7 @@ class OpportunityScanner
     {
         $scan ??= $user->scans()->create(['trigger' => $trigger]);
         $scan->update(['provider' => VenueResearcher::status()]);
-        $run = \App\Models\AiRun::begin($user, 'scan', $trigger === 'daily' ? 'Daily opportunity scan' : 'Opportunity scan', 3, route('opportunities'));
+        $run = \App\Models\AiRun::begin($user, 'scan', $trigger === 'daily' ? 'Daily calls for papers scan' : 'Calls for papers scan', 3, route('opportunities'));
 
         try {
             $interests = self::interestsFor($user);
@@ -123,13 +123,13 @@ class OpportunityScanner
             $run->note("Saved {$found} new of ".count($data['items'] ?? []).' returned');
             $run->finish();
             $scan->update(['log' => $run->fresh()->log]);
-            $user->notify(new AiJobFinished('Opportunity scan finished',
+            $user->notify(new AiJobFinished('Calls for papers scan finished',
                 $found ? "{$found} new ".Str::plural('call', $found).' that fit your interests.' : 'No new calls this time.', 'success', route('opportunities')));
         } catch (\Throwable $e) {
             $scan->update(['status' => 'failed', 'error' => Str::limit($e->getMessage(), 600), 'finished_at' => now()]);
             $run->finish($e->getMessage());
             $scan->update(['log' => $run->fresh()->log]);
-            $user->notify(new AiJobFinished('Opportunity scan failed', Str::limit($e->getMessage(), 200), 'danger', route('opportunities')));
+            $user->notify(new AiJobFinished('Calls for papers scan failed', Str::limit($e->getMessage(), 200), 'danger', route('opportunities')));
         }
 
         return $scan->fresh();

@@ -136,6 +136,6 @@ class BackupTest extends TestCase
         $this->assertSame(1, $paper->queue()->count());
         $this->assertSame(0, $paper->files()->count());
         $this->assertSame(2, $user->deadlines()->count());
-        $this->assertSame('Imported 1 paper, 1 new venue and 1 deadline.', Backup::summary($n));
+        $this->assertSame('Imported 1 paper, 1 new journal or conference and 1 deadline.', Backup::summary($n));
     }
 }

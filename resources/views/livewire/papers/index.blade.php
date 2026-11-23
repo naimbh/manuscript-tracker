@@ -99,7 +99,7 @@ new class extends Component {
                     <flux:button size="sm" variant="ghost" icon="plus" aria-label="New paper" />
                 </flux:modal.trigger>
             </div>
-            <flux:input wire:model.live.debounce.150ms="q" data-search icon="magnifying-glass" placeholder="Search titles, venues, keywords" size="sm" clearable>
+            <flux:input wire:model.live.debounce.150ms="q" data-search icon="magnifying-glass" placeholder="Search titles, journals, conferences, keywords" size="sm" clearable>
                 <x-slot name="iconTrailing"><span class="kbd">/</span></x-slot>
             </flux:input>
             <div class="flex items-stretch gap-2"><div class="flex min-w-0 flex-1 gap-0.5 rounded-lg bg-zinc-100 p-0.5 text-[11px] font-medium sm:text-xs dark:bg-zinc-800">

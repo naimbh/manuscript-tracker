@@ -12,7 +12,7 @@ use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 use Laravel\Mcp\Server\Tools\Annotations\IsIdempotent;
 
 #[IsReadOnly]
-#[Description('List the user’s papers with stage, current venue, manuscript ID, decision and days in review. Filter by stage or search text.')]
+#[Description('List the user’s papers with stage, current journal or conference, manuscript ID, decision and days in review. Filter by stage or search text.')]
 class ListPapers extends Tool
 {
     use ResolvesUser;

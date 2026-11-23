@@ -12,7 +12,7 @@ use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 use Laravel\Mcp\Server\Tools\Annotations\IsIdempotent;
 
 #[IsReadOnly]
-#[Description('Search the venue library: conferences (next edition, deadline, rank, proceedings) and journals (quartile, first decision, acceptance rate, fees).')]
+#[Description('Search the user’s journals and conferences: conferences (next edition, deadline, rank, proceedings) and journals (quartile, first decision, acceptance rate, fees).')]
 class SearchVenues extends Tool
 {
     use ResolvesUser;
