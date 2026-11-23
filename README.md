@@ -29,9 +29,9 @@ Manuscript Tracker is also available as a **free, open-source desktop app for ma
 
 | System | Download |
 | --- | --- |
-| macOS (Apple silicon and Intel) | [Manuscript.Tracker_1.0.0_universal.dmg](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.0_universal.dmg) |
-| Windows | [Installer (.exe)](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.0_x64-setup.exe) · [MSI package (.msi)](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.0_x64_en-US.msi) |
-| Linux | [AppImage](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.0_amd64.AppImage) · [Debian/Ubuntu (.deb)](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.0_amd64.deb) · [Fedora/RHEL (.rpm)](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker-1.0.0-1.x86_64.rpm) |
+| macOS (Apple silicon and Intel) | [Manuscript.Tracker_1.0.1_universal.dmg](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.1_universal.dmg) |
+| Windows | [Installer (.exe)](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.1_x64-setup.exe) · [MSI package (.msi)](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.1_x64_en-US.msi) |
+| Linux | [AppImage](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.1_amd64.AppImage) · [Debian/Ubuntu (.deb)](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker_1.0.1_amd64.deb) · [Fedora/RHEL (.rpm)](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest/download/Manuscript.Tracker-1.0.1-1.x86_64.rpm) |
 | Everything else | [All downloads](https://github.com/naimbh/manuscript-tracker-desktop/releases/latest) |
 
 The app is not yet signed, so your system may warn you the first time:
