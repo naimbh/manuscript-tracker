@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class User extends Authenticatable // implements MustVerifyEmail
@@ -62,8 +63,30 @@ class User extends Authenticatable // implements MustVerifyEmail
             ->implode('');
     }
 
+    /** URL of the profile photo (served from private storage), or null when there is none. */
+    public function avatarUrl(): ?string
+    {
+        return $this->avatar_path ? route('profile.photo', ['v' => substr(md5($this->avatar_path), 0, 12)]) : null;
+    }
+
+    /** Point the user at a stored photo (or none) and delete the previous file. */
+    public function setAvatar(?string $path): void
+    {
+        $old = $this->avatar_path;
+        $this->forceFill(['avatar_path' => $path])->save();
+        if ($old && $old !== $path) {
+            Storage::disk('local')->delete($old);
+        }
+    }
+
     protected static function booted(): void
     {
+        static::deleted(function (User $user) {
+            if ($user->avatar_path) {
+                Storage::disk('local')->delete($user->avatar_path);
+            }
+        });
+
         static::created(function (User $user) {
             if (static::count() === 1) {
                 $user->forceFill(['is_admin' => true])->saveQuietly();

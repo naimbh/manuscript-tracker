@@ -3,6 +3,7 @@
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\ProfilePhotoController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -25,6 +26,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::redirect('settings', 'settings/profile');
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
+    Route::get('settings/profile/photo', ProfilePhotoController::class)->name('profile.photo');
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
     Volt::route('settings/data', 'settings.data')->name('settings.data');

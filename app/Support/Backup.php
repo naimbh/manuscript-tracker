@@ -16,9 +16,13 @@ class Backup
 
     private const PROFILE = ['name', 'email', 'interests', 'scholar_url', 'scholar_stats', 'scholar_checked_at'];
 
+    /** Largest profile photo restored from a zip backup. */
+    private const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
+
     /**
      * The full backup (version 2). With $files, each paper file gets a "path" inside the zip,
-     * and $files is filled with zip path => path on the local disk.
+     * and $files is filled with zip path => path on the local disk. The profile photo then
+     * goes to the zip root as avatar.<ext>, named by profile.avatar (JSON-only backups omit it).
      */
     public static function export(User $user, ?array &$files = null): array
     {
@@ -41,11 +45,18 @@ class Backup
             $fileEntries[$f->id] = $entry;
         }
 
+        $profile = collect(self::PROFILE)->mapWithKeys(fn ($f) => [$f => $user->{$f} instanceof \DateTimeInterface ? $user->{$f}->toIso8601String() : $user->{$f}])->all();
+        if ($withFiles && $user->avatar_path && $disk->exists($user->avatar_path)) {
+            $ext = strtolower(pathinfo($user->avatar_path, PATHINFO_EXTENSION));
+            $profile['avatar'] = 'avatar.'.(in_array($ext, ['png', 'webp', 'jpg'], true) ? $ext : 'png');
+            $files[$profile['avatar']] = $disk->path($user->avatar_path);
+        }
+
         return [
             'app' => 'manuscript-tracker',
             'version' => 2,
             'exported_at' => now()->toIso8601String(),
-            'profile' => collect(self::PROFILE)->mapWithKeys(fn ($f) => [$f => $user->{$f} instanceof \DateTimeInterface ? $user->{$f}->toIso8601String() : $user->{$f}])->all(),
+            'profile' => $profile,
             'venues' => $venues->map(fn ($v) => array_merge(Arr::except($v->toArray(), self::STRIP), ['deadline_on' => $date($v->deadline_on)]))->values(),
             'papers' => $papers->map(fn ($p) => array_merge(Arr::except($p->only(array_keys($p->getAttributes())), self::STRIP), [
                 'preprint_on' => $date($p->preprint_on),
@@ -212,6 +223,14 @@ class Backup
                 }
                 $user->save();
 
+                // The profile photo (zip backups only), when the account has none yet.
+                if ($zip && is_string($entry = $data['profile']['avatar'] ?? null) && blank($user->avatar_path)
+                    && ($path = self::restoreAvatar($zip, $entry))) {
+                    $stored[] = $path;
+                    $user->forceFill(['avatar_path' => $path])->save();
+                    $n['profile']++;
+                }
+
                 // Site settings belong to the admin. Only missing, non-secret keys are added.
                 if ($user->is_admin) {
                     foreach ($data['settings'] ?? [] as $key => $value) {
@@ -228,6 +247,29 @@ class Backup
         }
 
         return $n;
+    }
+
+    /** Copies avatar.<ext> out of a zip into private storage; returns the stored path, or null. */
+    private static function restoreAvatar(ZipArchive $zip, string $entry): ?string
+    {
+        if (! preg_match('/^avatar\.[a-z]+$/', $entry) || ($stat = $zip->statName($entry)) === false || $stat['size'] > self::MAX_AVATAR_BYTES) {
+            return null;
+        }
+        $bytes = $zip->getFromName($entry);
+        $ext = match (true) {
+            ! is_string($bytes) => null,
+            str_starts_with($bytes, "\x89PNG\r\n\x1a\n") => 'png',
+            str_starts_with($bytes, 'RIFF') && substr($bytes, 8, 4) === 'WEBP' => 'webp',
+            str_starts_with($bytes, "\xFF\xD8\xFF") => 'jpg',
+            default => null,
+        };
+        if (! $ext) {
+            return null;
+        }
+        $path = 'avatars/'.Str::random(40).'.'.$ext;
+        Storage::disk('local')->put($path, $bytes);
+
+        return $path;
     }
 
     /** A short sentence such as “Imported 2 papers, 3 files and 1 new venue.” */

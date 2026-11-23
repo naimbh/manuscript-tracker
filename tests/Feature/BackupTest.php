@@ -108,6 +108,49 @@ class BackupTest extends TestCase
         @unlink($copy);
     }
 
+    public function test_zip_backups_carry_the_profile_photo(): void
+    {
+        Storage::fake('local');
+        $user = $this->sampleUser();
+        $png = "\x89PNG\r\n\x1a\n".str_repeat("\0", 40);
+        Storage::disk('local')->put('avatars/ada.png', $png);
+        $user->setAvatar('avatars/ada.png');
+
+        // JSON-only backups leave the photo out.
+        $this->assertArrayNotHasKey('avatar', Backup::export($user)['profile']);
+        $json = $this->actingAs($user)->get('/export.json')->assertOk()->getContent();
+        $this->assertArrayNotHasKey('avatar', json_decode($json, true)['profile']);
+
+        $copy = tempnam(sys_get_temp_dir(), 'bk');
+        file_put_contents($copy, file_get_contents(Backup::zip($user)));
+        $zip = new ZipArchive;
+        $this->assertTrue($zip->open($copy));
+        $data = json_decode($zip->getFromName('backup.json'), true);
+        $this->assertSame('avatar.png', $data['profile']['avatar']);
+        $this->assertSame($png, $zip->getFromName('avatar.png'));
+        $zip->close();
+
+        // An account without a photo gets it (and it counts as a profile field).
+        $other = User::factory()->create(['name' => 'Grace Hopper']);
+        $n = Backup::importFile($other, $copy);
+        $other->refresh();
+        $this->assertMatchesRegularExpression('#^avatars/[A-Za-z0-9]{40}\.png$#', $other->avatar_path);
+        $this->assertSame($png, Storage::disk('local')->get($other->avatar_path));
+        $this->assertGreaterThanOrEqual(1, $n['profile']);
+
+        // An account that already has a photo keeps it.
+        $kept = $other->avatar_path;
+        Backup::importFile($other, $copy);
+        $this->assertSame($kept, $other->fresh()->avatar_path);
+        $this->assertCount(2, Storage::disk('local')->files('avatars'));
+
+        // A JSON import never sets a photo.
+        $third = User::factory()->create();
+        Backup::import($third, $data);
+        $this->assertNull($third->fresh()->avatar_path);
+        @unlink($copy);
+    }
+
     public function test_v1_json_backup_still_imports(): void
     {
         $user = User::factory()->create();
