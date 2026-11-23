@@ -2,11 +2,11 @@
 
 <img src="public/logo.svg" width="72" height="72" alt="Manuscript Tracker logo">
 
-# Manuscript Tracker
+# Manuscript Tracker: a self-hosted manuscript and journal submission tracker
 
-**A self-hosted tracker for academic papers, from draft to decision.**
+**An academic paper tracker for researchers and PhD students, from draft to decision.**
 
-Follow every manuscript through every journal and conference it is sent to, watch review clocks, keep your journals and conferences up to date with AI, find calls for papers that fit your work, and see your Google Scholar citations in one place.
+Track every manuscript through every journal and conference it is sent to, follow its peer review status and editor decisions, watch review clocks and revision deadlines, keep your journals and conferences up to date with AI, find calls for papers that fit your work, and see your Google Scholar citations in one place. Self-hosted, so your data stays in your own database.
 
 [![Laravel 12](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
 [![Livewire](https://img.shields.io/badge/Livewire-Volt%20%2B%20Flux-4E56A6)](https://livewire.laravel.com)
@@ -19,11 +19,21 @@ Follow every manuscript through every journal and conference it is sent to, watc
 
 ![A short tour of Manuscript Tracker: the desk, papers, reviewer checklist, journals and conferences, calls for papers and citations](docs/demo.gif)
 
-## Why
+## Prefer a desktop app?
+
+Manuscript Tracker is also available as a **free, open-source desktop app for macOS, Windows and Linux**: [naimbh/manuscript-tracker-desktop](https://github.com/naimbh/manuscript-tracker-desktop). It needs no server, works fully offline, and uses AI only if you choose to.
+
+Your data moves both ways. In either app, open **Backup & calendar → Download backup (.zip)**, then use **Import** in the other app.
+
+<p align="center">
+  <a href="https://github.com/naimbh/manuscript-tracker-desktop/releases/latest"><img src="https://img.shields.io/badge/Download%20the%20desktop%20app-macOS%20·%20Windows%20·%20Linux-4f46e5?style=for-the-badge" alt="Download the Manuscript Tracker desktop app for macOS, Windows and Linux"></a>
+</p>
+
+## Why a manuscript tracker instead of a spreadsheet?
 
 Most researchers track submissions in a spreadsheet. A spreadsheet cannot tell you that a review has run past the journal's usual decision time, that a public preprint may break a double-anonymous review, or which journal to try next after a desk rejection. Manuscript Tracker knows what a manuscript ID, a desk rejection, a review clock and a preprint policy are, and it keeps your data in your own database.
 
-## Features
+## Features for tracking papers, submissions and peer review
 
 **Papers and submissions**
 - One record per paper with abstract, keywords, method, data, links, tags (such as *Thesis* or *Preprint*) and notes.
@@ -70,115 +80,17 @@ Most researchers track submissions in a spreadsheet. A spreadsheet cannot tell y
 
 Screenshots use the fictional demo data that ships with the app. A dark theme is also included.
 
-## Tech stack
-
-- [Laravel 12](https://laravel.com) with [Livewire](https://livewire.laravel.com), [Volt](https://livewire.laravel.com/docs/volt) and [Flux UI](https://fluxui.dev)
-- [Tailwind CSS 4](https://tailwindcss.com) and [Alpine.js](https://alpinejs.dev)
-- MySQL (SQLite also works)
-- Your choice of AI for the research features: Claude (Claude Code CLI or Anthropic API), OpenAI, Google Gemini, or any OpenAI-compatible provider
-- [Laravel MCP](https://laravel.com/docs/mcp) for the agent tools
-
-## Getting started
-
-Requirements: PHP 8.2+, Composer, Node.js 20+ and MySQL 8 (or SQLite). [Laravel Herd](https://herd.laravel.com) is the quickest way to get all of them on macOS or Windows.
-
-```bash
-git clone https://github.com/naimbh/manuscript-tracker.git
-cd manuscript-tracker
-composer install
-npm install && npm run build
-cp .env.example .env
-php artisan key:generate
-```
-
-Create a database, set `DB_CONNECTION`, `DB_DATABASE`, `DB_USERNAME` and `DB_PASSWORD` in `.env`, then:
-
-```bash
-php artisan migrate --seed
-php artisan storage:link
-```
-
-Open the app (for example `http://manuscripttracker.test` with Herd, or run `php artisan serve`) and sign in with the first account, **admin@gmail.com / 123456** unless you set `TRACKER_ADMIN_EMAIL` and `TRACKER_ADMIN_PASSWORD` in `.env` before seeding. Change the email and password under **Settings → Profile** straight away. Other people can register from the login page; each account starts with the starter list of journals and conferences and keeps its own papers.
-
-Then open **Settings → Research profile** to add your Google Scholar link and research interests, and **Settings → AI** to choose an AI provider.
-
-### Try it with demo data
-
-```bash
-php artisan db:seed --class=DemoSeeder
-```
-
-Then sign in as **demo@example.com / password**.
-
 ## AI features
 
-The calls for papers scan, journal and conference updates, and citation updates need an AI model that can search the web. Choose one under **Settings → AI**, paste its key, and press **Test connection**:
+The calls for papers scan, journal and conference updates, and citation updates use an AI model that can search the web. You can choose Claude (Claude Code or the Anthropic API), OpenAI, Google Gemini, or any OpenAI-compatible provider under **Settings → AI**. The AI is asked to use official pages, to return `null` rather than guess, and to list its sources, which the app shows next to each journal and conference.
 
-| Provider | What you need | Web search |
-|---|---|---|
-| Claude Code | A Claude subscription and [Claude Code](https://docs.claude.com/en/docs/claude-code). Run `claude setup-token` and paste the token. | Built in |
-| Anthropic API | An API key from the [Claude Console](https://console.anthropic.com) | Claude web search tool |
-| OpenAI | An API key from [platform.openai.com](https://platform.openai.com) | Responses API web search |
-| Google Gemini | A key from [Google AI Studio](https://aistudio.google.com) | Google Search grounding |
-| OpenAI-compatible | A base URL, model and (if needed) key for OpenRouter, Groq, Perplexity, Together, Ollama or LM Studio | Depends on the model (for example OpenRouter `:online` models or Perplexity Sonar) |
+Manuscript Tracker also includes **agent tools (MCP)**, so Claude Desktop, Claude Code, Cursor or any MCP client can read your papers and record submissions, decisions and deadlines.
 
-Keys are stored encrypted with your app key. You can also set them in `.env` (see `.env.example`); values saved in Settings take priority.
-
-The AI is asked to use official pages, to return `null` rather than guess, and to list its sources, which the app shows next to each journal and conference. Check important dates on the official site before you rely on them.
-
-## Agent tools (MCP)
-
-Manuscript Tracker includes a [Model Context Protocol](https://modelcontextprotocol.io) server, so AI assistants can work with your tracker. Tools: `list-papers`, `get-paper`, `add-paper`, `update-paper`, `record-submission`, `update-submission`, `record-decision`, `attach-file` (local server only), `list-deadlines`, `add-deadline`, `search-venues`, `list-opportunities` and `list-publications`.
-
-**On the same computer** (Claude Desktop, Claude Code, Cursor): add a server that runs
-
-```bash
-php /path/to/manuscript-tracker/artisan mcp:start tracker
-```
-
-Settings → Agents shows the exact config to copy. The local server acts for the account in `TRACKER_MCP_USER`, or the first account.
-
-**Over the web**: create an agent token under **Settings → Agents** and connect your client to `https://your-domain/mcp` with the header `Authorization: Bearer <token>`.
-
-## Deploying to shared hosting (cPanel)
-
-1. Clone the repo with cPanel → Git Version Control, outside `public_html`.
-2. Run `composer install --no-dev --optimize-autoloader`, copy `.env.example` to `.env`, set `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL` and the database, then `php artisan key:generate --force` and `php artisan migrate --force`.
-3. The built front end (`public/build`) is committed, so the server does not need Node.js. If you change the CSS or JavaScript, run `git config core.hooksPath .githooks` once; the pre-commit hook then rebuilds and commits `public/build` for you.
-4. Point the domain's document root at `public/`. If you cannot, the root `.htaccess` sends every request into `public/`.
-5. Add a cron job: `* * * * * cd /path/to/manuscript-tracker && php artisan schedule:run >> /dev/null 2>&1`.
-
-## Schedules
-
-| Job | When |
-|---|---|
-| Calls for papers scan | Every day at 6:00 (`TRACKER_SCAN_TIME`) |
-| Journal and conference updates (watched ones) | Mondays at 7:00 (`TRACKER_VENUES_DAY`, `TRACKER_VENUES_TIME`) |
-| Citation updates from Google Scholar | Wednesdays at 7:00 (`TRACKER_CITATIONS_DAY`, `TRACKER_CITATIONS_TIME`) |
-
-Run the scheduler with `php artisan schedule:work`, or add the usual cron entry on a server:
-
-```cron
-* * * * * cd /path/to/manuscript-tracker && php artisan schedule:run >> /dev/null 2>&1
-```
+See [Installation and setup](docs/INSTALLATION.md#ai-features) for providers, keys and MCP setup.
 
 ## Your data
 
 Everything lives in your own database and `storage/app`. Export a JSON backup or import one under **Settings → Backup & calendar**. Uploaded files are private and served only to their owner.
-
-To seed your own papers without committing them, put a seeder in `database/seeders/Private/` (git ignores that folder). `DatabaseSeeder` runs `Private\MyPapersSeeder` and `Private\MyPublicationsSeeder` if they exist.
-
-## Configuration
-
-The first account is the site admin. Under **Settings → General** the admin sets the site name, tagline, description, timezone, contact email, footer credit, and whether new people can sign up (turn this off for a private site).
-
-Everything specific to a person or a deployment is set in `.env` or in Settings, not in the code: the first account (`TRACKER_ADMIN_*`), schedules (`TRACKER_*_DAY`, `TRACKER_*_TIME`), the AI provider and keys, the MCP account (`TRACKER_MCP_USER`), and the footer credit (`TRACKER_CREDIT_NAME`, `TRACKER_CREDIT_URL`; leave empty to hide). Each user sets their own Scholar profile and interests.
-
-## Tests
-
-```bash
-php artisan test
-```
 
 ## Support the project
 
@@ -189,3 +101,13 @@ If Manuscript Tracker saves you time, please give it a ⭐ on GitHub. It helps o
 [PolyForm Noncommercial 1.0.0](LICENSE) © 2026 [Naim Bin Hasan](https://naimbh.com/dev)
 
 You may use, change and share this software for any **noncommercial** purpose: personal use, research, teaching, and use by universities, charities and other noncommercial organizations. Commercial use, including selling it, offering it as a paid service or using it inside a business, is not allowed without permission. For a commercial license, get in touch through [naimbh.com/dev](https://naimbh.com/dev).
+
+## Install and develop
+
+<p>
+  <a href="docs/INSTALLATION.md"><img src="https://img.shields.io/badge/Installation%20and%20setup-docs%2FINSTALLATION.md-4f46e5?style=for-the-badge" alt="Installation and setup guide"></a>
+  <a href="docs/DEVELOPMENT.md"><img src="https://img.shields.io/badge/Development-docs%2FDEVELOPMENT.md-64748b?style=for-the-badge" alt="Development guide"></a>
+</p>
+
+- [Installation and setup](docs/INSTALLATION.md): tech stack, local install, demo data, AI providers, agent tools (MCP), shared hosting (cPanel), schedules and configuration.
+- [Development](docs/DEVELOPMENT.md): running the tests and rebuilding the front end.
