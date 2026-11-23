@@ -136,7 +136,7 @@ new #[Title('Calls for Papers')] class extends Component {
                             <span class="font-medium">{{ $sc->created_at->format('j M Y, H:i') }}</span>
                             <span class="text-xs text-zinc-500">{{ $sc->trigger === 'daily' ? 'Daily' : 'Manual' }}</span>
                             <span class="text-xs text-zinc-500">{{ $sc->candidates }} candidates · {{ $sc->found }} new</span>
-                            @if ($sc->finished_at)<span class="num text-xs text-zinc-400">{{ $sc->created_at->diffInSeconds($sc->finished_at) < 90 ? (int) $sc->created_at->diffInSeconds($sc->finished_at).'s' : round($sc->created_at->diffInMinutes($sc->finished_at), 1).' min' }}</span>@endif
+                            @if ($sc->finished_at?->gte($sc->created_at))<span class="num text-xs text-zinc-400">{{ $sc->created_at->diffInSeconds($sc->finished_at) < 90 ? (int) $sc->created_at->diffInSeconds($sc->finished_at).'s' : round($sc->created_at->diffInMinutes($sc->finished_at), 1).' min' }}</span>@endif
                             @if ($sc->provider)<span class="text-xs text-zinc-400">· {{ $sc->provider }}</span>@endif
                             <flux:icon.chevron-down variant="micro" class="ml-auto size-4 text-zinc-400 transition" ::class="open && 'rotate-180'" />
                         </button>

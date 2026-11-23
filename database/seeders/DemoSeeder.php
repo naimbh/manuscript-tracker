@@ -111,7 +111,7 @@ class DemoSeeder extends Seeder
         }
 
         // Opportunities
-        $scan = $user->scans()->create(['status' => 'done', 'trigger' => 'daily', 'found' => 3, 'candidates' => 28, 'finished_at' => now()->subHours(3)]);
+        $scan = $user->scans()->create(['status' => 'done', 'trigger' => 'daily', 'found' => 3, 'candidates' => 28, 'created_at' => now()->subHours(3)->subSeconds(45), 'finished_at' => now()->subHours(3)]);
         foreach ([
             ['title' => 'Special issue: Algorithmic Management beyond the Platform', 'kind' => 'special_issue', 'venue' => 'Example Journal of Work and Technology', 'outlet' => 'SJR Q1', 'deadline_on' => now()->addDays(48), 'fit' => 5,
                 'summary' => 'Invites empirical work on how algorithmic control spreads from platforms into conventional workplaces.', 'why' => 'Matches the delivery study and its focus on scheduling and autonomy.'],
